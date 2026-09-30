@@ -267,14 +267,25 @@
       </div>
 
       <label for="photo" class="button upload-button">
-        📷 Fotoğraf Seç
-      </label>
+    📷 Fotoğraf Seç
+</label>
 
-      <input
-        type="file"
-        id="photo"
-        accept="image/,video/"
-      >
+<input
+    type="file"
+    id="photo"
+    accept="image/*,video/*"
+>
+      
+
+<label for="video" class="button upload-button">
+    🎥 Video Seç
+</label>
+
+<input
+    type="file"
+    id="video"
+    accept="video/*"
+>
 
       <div id="fileName" class="file-name">
         Henüz fotoğraf seçilmedi.
@@ -355,6 +366,9 @@
   const photoInput =
     document.getElementById("photo");
 
+const videoInput =
+    document.getElementById("video");
+  
   const fileName =
     document.getElementById("fileName");
 
