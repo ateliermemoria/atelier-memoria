@@ -6,6 +6,8 @@
 
   <title>Atelier Memoria</title>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -17,20 +19,18 @@
       font-family: Arial, sans-serif;
       background: #f7f3ee;
       color: #332b28;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 24px;
+      padding: 30px 18px;
     }
 
     .container {
       width: 100%;
       max-width: 520px;
+      margin: auto;
       text-align: center;
     }
 
     .logo {
-      font-size: 14px;
+      font-size: 13px;
       letter-spacing: 4px;
       text-transform: uppercase;
       color: #8a7567;
@@ -48,21 +48,20 @@
       font-size: 15px;
       line-height: 1.6;
       color: #756963;
-      margin-bottom: 35px;
+      margin-bottom: 30px;
     }
 
     .card {
       background: white;
       border-radius: 24px;
-      padding: 30px 22px;
+      padding: 28px 22px;
       box-shadow: 0 10px 35px rgba(80, 60, 45, 0.08);
     }
 
     .upload-area {
       border: 1.5px dashed #cbbcaf;
       border-radius: 18px;
-      padding: 30px 15px;
-      margin-bottom: 18px;
+      padding: 28px 15px;
     }
 
     .camera {
@@ -78,7 +77,41 @@
     .upload-text {
       font-size: 13px;
       color: #8a7d76;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 7px;
+      color: #5f554f;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #ddd2ca;
+      border-radius: 12px;
+      padding: 13px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #9d8879;
     }
 
     input[type="file"] {
@@ -87,11 +120,12 @@
 
     .button {
       display: inline-block;
+      width: 100%;
       background: #332b28;
       color: white;
       border: none;
       border-radius: 12px;
-      padding: 14px 25px;
+      padding: 14px 20px;
       font-size: 15px;
       cursor: pointer;
     }
@@ -100,11 +134,77 @@
       opacity: 0.9;
     }
 
+    .upload-button {
+      margin-top: 5px;
+    }
+
     .gallery-button {
-      width: 100%;
       margin-top: 12px;
       background: #f0e9e2;
       color: #332b28;
+    }
+
+    .file-name {
+      font-size: 12px;
+      color: #8a7d76;
+      margin-top: 10px;
+      word-break: break-word;
+    }
+
+    .status {
+      margin-top: 15px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .gallery {
+      margin-top: 25px;
+      display: none;
+    }
+
+    .gallery h2 {
+      font-family: Georgia, serif;
+      font-size: 25px;
+      font-weight: normal;
+      margin-bottom: 18px;
+    }
+
+    .photo-card {
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      box-shadow: 0 5px 20px rgba(80, 60, 45, 0.08);
+      text-align: left;
+    }
+
+    .photo-card img {
+      width: 100%;
+      display: block;
+      max-height: 500px;
+      object-fit: cover;
+    }
+
+    .photo-info {
+      padding: 15px;
+    }
+
+    .photo-name {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 7px;
+    }
+
+    .photo-note {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #756963;
+    }
+
+    .empty {
+      color: #8a7d76;
+      font-size: 13px;
+      padding: 15px;
     }
 
     .footer {
@@ -113,59 +213,503 @@
       color: #a0958e;
       letter-spacing: 1px;
     }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <div class="logo">Atelier Memoria</div>
+  <div class="logo">Atelier Memoria</div>
 
-    <h1>Anılar burada başlar.</h1>
+  <h1>Anılar burada başlar.</h1>
 
-    <div class="subtitle">
-      Bu özel güne ait fotoğraflarınızı<br>
-      bizimle paylaşın ve anılara ortak olun.
-    </div>
+  <div class="subtitle">
+    Bu özel güne ait fotoğraflarınızı<br>
+    bizimle paylaşın ve anılara ortak olun.
+  </div>
 
-    <div class="card">
+  <div class="card">
 
-      <div class="upload-area">
+    <div class="upload-area">
 
-        <div class="camera">📸</div>
+      <div class="camera">📸</div>
 
-        <div class="upload-title">
-          Fotoğrafınızı paylaşın
-        </div>
-
-        <div class="upload-text">
-          Galerinizden bir fotoğraf seçin
-        </div>
-
-        <label for="photo" class="button">
-          Fotoğraf Yükle
-        </label>
-
-        <input
-          type="file"
-          id="photo"
-          accept="image/*"
-        >
-
+      <div class="upload-title">
+        Fotoğrafınızı paylaşın
       </div>
 
-      <button class="button gallery-button">
-        🖼️ Fotoğrafları Gör
+      <div class="upload-text">
+        Fotoğrafınızı seçin, adınızı ve dilerseniz bir not bırakın.
+      </div>
+
+      <div class="form-group">
+        <label for="name">Adınız</label>
+        <input
+          type="text"
+          id="name"
+          placeholder="Örn. Büşra"
+          maxlength="60"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="note">Notunuz</label>
+        <textarea
+          id="note"
+          placeholder="Bu güzel güne küçük bir not bırakın..."
+          maxlength="500"
+        ></textarea>
+      </div>
+
+      <label for="photo" class="button upload-button">
+        📷 Fotoğraf Seç
+      </label>
+
+      <input
+        type="file"
+        id="photo"
+        accept="image/*"
+      >
+
+      <div id="fileName" class="file-name">
+        Henüz fotoğraf seçilmedi.
+      </div>
+
+      <button
+        id="uploadButton"
+        class="button upload-button"
+        type="button"
+      >
+        Fotoğrafı Paylaş
       </button>
 
+      <div id="status" class="status"></div>
+
     </div>
 
-    <div class="footer">
-      ATELIER MEMORIA • YOUR MOMENTS, FOREVER
-    </div>
+    <button
+      id="galleryButton"
+      class="button gallery-button"
+      type="button"
+    >
+      🖼️ Fotoğrafları Gör
+    </button>
 
   </div>
+
+  <div id="gallery" class="gallery">
+
+    <h2>Bu Günden Kalanlar</h2>
+
+    <div id="galleryContent"></div>
+
+  </div>
+
+  <div class="footer">
+    ATELIER MEMORIA • YOUR MOMENTS, FOREVER
+  </div>
+
+</div>
+
+
+<script>
+
+  /* ==========================================
+     SUPABASE AYARLARI
+     ========================================== */
+
+  const SUPABASE_URL =
+    "https://hokwiohkbceiyffqwrbn.supabase.co";
+
+  const SUPABASE_ANON_KEY =
+    "sb_publishable_6BRruSgb5EKyMhP7CSOwzw_KrcaXOWq";
+
+
+  const supabaseClient =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+
+  /* ==========================================
+     ETKİNLİK KODU
+     ========================================== */
+
+  const urlParams =
+    new URLSearchParams(window.location.search);
+
+  const EVENT_CODE =
+    urlParams.get("event") || "demo";
+
+
+  /* ==========================================
+     ELEMENTLER
+     ========================================== */
+
+  const photoInput =
+    document.getElementById("photo");
+
+  const fileName =
+    document.getElementById("fileName");
+
+  const nameInput =
+    document.getElementById("name");
+
+  const noteInput =
+    document.getElementById("note");
+
+  const uploadButton =
+    document.getElementById("uploadButton");
+
+  const galleryButton =
+    document.getElementById("galleryButton");
+
+  const status =
+    document.getElementById("status");
+
+  const gallery =
+    document.getElementById("gallery");
+
+  const galleryContent =
+    document.getElementById("galleryContent");
+
+
+  /* ==========================================
+     FOTOĞRAF SEÇİLDİ
+     ========================================== */
+
+  photoInput.addEventListener("change", function() {
+
+    if (this.files.length > 0) {
+
+      fileName.textContent =
+        "Seçilen fotoğraf: " +
+        this.files[0].name;
+
+    } else {
+
+      fileName.textContent =
+        "Henüz fotoğraf seçilmedi.";
+
+    }
+
+  });
+
+
+  /* ==========================================
+     FOTOĞRAF YÜKLE
+     ========================================== */
+
+  uploadButton.addEventListener("click", async function() {
+
+    const file =
+      photoInput.files[0];
+
+    const name =
+      nameInput.value.trim();
+
+    const note =
+      noteInput.value.trim();
+
+
+    if (!file) {
+
+      status.textContent =
+        "Lütfen önce bir fotoğraf seçin.";
+
+      return;
+
+    }
+
+
+    if (!name) {
+
+      status.textContent =
+        "Lütfen adınızı yazın.";
+
+      nameInput.focus();
+
+      return;
+
+    }
+
+
+    if (!file.type.startsWith("image/")) {
+
+      status.textContent =
+        "Lütfen yalnızca fotoğraf yükleyin.";
+
+      return;
+
+    }
+
+
+    if (file.size > 10 * 1024 * 1024) {
+
+      status.textContent =
+        "Fotoğraf 10 MB'dan küçük olmalı.";
+
+      return;
+
+    }
+
+
+    uploadButton.disabled = true;
+
+    uploadButton.textContent =
+      "Fotoğraf yükleniyor...";
+
+    status.textContent = "";
+
+
+    try {
+
+      const extension =
+        file.name.split(".").pop();
+
+
+      const fileName =
+        Date.now() +
+        "-" +
+        crypto.randomUUID() +
+        "." +
+        extension;
+
+
+      const filePath =
+        EVENT_CODE + "/" + fileName;
+
+
+      /* FOTOĞRAFI STORAGE'A YÜKLE */
+
+      const { error: uploadError } =
+        await supabaseClient
+          .storage
+          .from("event-files")
+          .upload(
+            filePath,
+            file,
+            {
+              contentType: file.type,
+              upsert: false
+            }
+          );
+
+
+      if (uploadError) {
+
+        throw uploadError;
+
+      }
+
+
+      /* FOTOĞRAFIN PUBLIC URL'SİNİ AL */
+
+      const { data: publicUrlData } =
+        supabaseClient
+          .storage
+          .from("event-files")
+          .getPublicUrl(filePath);
+
+
+      const fileUrl =
+        publicUrlData.publicUrl;
+
+
+      /* BİLGİLERİ TABLOYA KAYDET */
+
+      const { error: databaseError } =
+        await supabaseClient
+          .from("event_photos")
+          .insert({
+
+            event_code: EVENT_CODE,
+
+            file_path: filePath,
+
+            file_url: fileUrl,
+
+            uploader_name: name,
+
+            note: note || null
+
+          });
+
+
+      if (databaseError) {
+
+        throw databaseError;
+
+      }
+
+
+      status.textContent =
+        "✨ Fotoğrafınız ve notunuz başarıyla paylaşıldı.";
+
+
+      photoInput.value = "";
+
+      nameInput.value = "";
+
+      noteInput.value = "";
+
+      fileName.textContent =
+        "Henüz fotoğraf seçilmedi.";
+
+
+      uploadButton.textContent =
+        "Fotoğrafı Paylaş";
+
+
+      /* GALERİYİ YENİLE */
+
+      await loadGallery();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      status.textContent =
+        "Bir sorun oluştu. Lütfen tekrar deneyin.";
+
+      uploadButton.textContent =
+        "Fotoğrafı Paylaş";
+
+    }
+
+
+    uploadButton.disabled = false;
+
+  });
+
+
+  /* ==========================================
+     GALERİ
+     ========================================== */
+
+  galleryButton.addEventListener(
+    "click",
+    loadGallery
+  );
+
+
+  async function loadGallery() {
+
+    gallery.style.display = "block";
+
+    galleryContent.innerHTML =
+      '<div class="empty">Fotoğraflar yükleniyor...</div>';
+
+
+    const { data, error } =
+      await supabaseClient
+        .from("event_photos")
+        .select("*")
+        .eq("event_code", EVENT_CODE)
+        .order("created_at", {
+          ascending: false
+        });
+
+
+    if (error) {
+
+      console.error(error);
+
+      galleryContent.innerHTML =
+        '<div class="empty">Fotoğraflar yüklenemedi.</div>';
+
+      return;
+
+    }
+
+
+    if (!data || data.length === 0) {
+
+      galleryContent.innerHTML =
+        '<div class="empty">Henüz fotoğraf paylaşılmamış.</div>';
+
+      return;
+
+    }
+
+
+    galleryContent.innerHTML = "";
+
+
+    data.forEach(photo => {
+
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "photo-card";
+
+
+      const image =
+        document.createElement("img");
+
+      image.src =
+        photo.file_url;
+
+      image.alt =
+        "Atelier Memoria";
+
+
+      const info =
+        document.createElement("div");
+
+      info.className =
+        "photo-info";
+
+
+      const person =
+        document.createElement("div");
+
+      person.className =
+        "photo-name";
+
+      person.textContent =
+        "♡ " + photo.uploader_name;
+
+
+      const note =
+        document.createElement("div");
+
+      note.className =
+        "photo-note";
+
+      note.textContent =
+        photo.note || "";
+
+
+      info.appendChild(person);
+
+      if (photo.note) {
+
+        info.appendChild(note);
+
+      }
+
+
+      card.appendChild(image);
+
+      card.appendChild(info);
+
+
+      galleryContent.appendChild(card);
+
+    });
+
+  }
+
+</script>
 
 </body>
 </html>
