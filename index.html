@@ -3,50 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Atelier Memoria</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
+      min-height: 100vh;
       font-family: Arial, sans-serif;
-      background: #f8f5f0;
-      color: #3d3028;
-      text-align: center;
+      background: #f7f3ee;
+      color: #332b28;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
     }
 
     .container {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 60px 25px;
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 14px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #8a7567;
+      margin-bottom: 25px;
     }
 
     h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
+      font-family: Georgia, serif;
+      font-size: 38px;
+      font-weight: normal;
+      margin: 0 0 12px;
     }
 
-    p {
-      color: #75675d;
+    .subtitle {
+      font-size: 15px;
       line-height: 1.6;
+      color: #756963;
+      margin-bottom: 35px;
     }
 
-    .box {
+    .card {
       background: white;
-      padding: 30px;
-      margin-top: 35px;
-      border-radius: 20px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+      border-radius: 24px;
+      padding: 30px 22px;
+      box-shadow: 0 10px 35px rgba(80, 60, 45, 0.08);
     }
 
-    button {
-      background: #3d3028;
+    .upload-area {
+      border: 1.5px dashed #cbbcaf;
+      border-radius: 18px;
+      padding: 30px 15px;
+      margin-bottom: 18px;
+    }
+
+    .camera {
+      font-size: 42px;
+      margin-bottom: 12px;
+    }
+
+    .upload-title {
+      font-size: 17px;
+      margin-bottom: 7px;
+    }
+
+    .upload-text {
+      font-size: 13px;
+      color: #8a7d76;
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .button {
+      display: inline-block;
+      background: #332b28;
       color: white;
       border: none;
-      padding: 15px 30px;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 12px;
+      padding: 14px 25px;
+      font-size: 15px;
       cursor: pointer;
-      margin-top: 20px;
+    }
+
+    .button:hover {
+      opacity: 0.9;
+    }
+
+    .gallery-button {
+      width: 100%;
+      margin-top: 12px;
+      background: #f0e9e2;
+      color: #332b28;
+    }
+
+    .footer {
+      margin-top: 28px;
+      font-size: 11px;
+      color: #a0958e;
+      letter-spacing: 1px;
     }
   </style>
 </head>
@@ -55,26 +120,49 @@
 
   <div class="container">
 
-    <h1>Atelier Memoria</h1>
+    <div class="logo">Atelier Memoria</div>
 
-    <p>
-      Anılarınızı bizimle paylaşın.
-      Fotoğraf ve videolarınızı güvenle yükleyebilirsiniz.
-    </p>
+    <h1>Anılar burada başlar.</h1>
 
-    <div class="box">
-      <h2>Anınızı Yükleyin</h2>
+    <div class="subtitle">
+      Bu özel güne ait fotoğraflarınızı<br>
+      bizimle paylaşın ve anılara ortak olun.
+    </div>
 
-      <p>
-        Fotoğraf veya videonuzu seçerek
-        anılarınıza katkıda bulunabilirsiniz.
-      </p>
+    <div class="card">
 
-      <input type="file" accept="image/,video/" multiple>
+      <div class="upload-area">
 
-      <br>
+        <div class="camera">📸</div>
 
-      <button>Fotoğrafları Yükle</button>
+        <div class="upload-title">
+          Fotoğrafınızı paylaşın
+        </div>
+
+        <div class="upload-text">
+          Galerinizden bir fotoğraf seçin
+        </div>
+
+        <label for="photo" class="button">
+          Fotoğraf Yükle
+        </label>
+
+        <input
+          type="file"
+          id="photo"
+          accept="image/*"
+        >
+
+      </div>
+
+      <button class="button gallery-button">
+        🖼️ Fotoğrafları Gör
+      </button>
+
+    </div>
+
+    <div class="footer">
+      ATELIER MEMORIA • YOUR MOMENTS, FOREVER
     </div>
 
   </div>
