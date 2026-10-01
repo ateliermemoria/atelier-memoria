@@ -1,276 +1,1087 @@
-<style>
-  * {
-    box-sizing: border-box;
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Atelier Memoria</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      color: #332b28;
+      padding: 35px 18px;
+
+      background-color: #f7f1e9;
+
+      background-image:
+        radial-gradient(circle at 10% 15%, rgba(166, 137, 112, 0.12) 0 2px, transparent 3px),
+        radial-gradient(circle at 85% 20%, rgba(166, 137, 112, 0.10) 0 2px, transparent 3px),
+        radial-gradient(circle at 20% 80%, rgba(166, 137, 112, 0.10) 0 2px, transparent 3px),
+        radial-gradient(circle at 75% 75%, rgba(166, 137, 112, 0.10) 0 2px, transparent 3px);
+
+      background-size:
+        85px 85px,
+        120px 120px,
+        100px 100px,
+        140px 140px;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+
+      background-image:
+        linear-gradient(
+          45deg,
+          transparent 48%,
+          rgba(150, 125, 105, 0.08) 49%,
+          transparent 51%
+        );
+
+      background-size: 42px 42px;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+
+      width: 100%;
+      max-width: 540px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 12px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: #907968;
+      margin-bottom: 22px;
+    }
+
+    .ornament {
+      color: #a18b79;
+      font-size: 18px;
+      letter-spacing: 8px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: Georgia, serif;
+      font-size: 38px;
+      font-weight: normal;
+      line-height: 1.2;
+      margin: 0 0 12px;
+      color: #332b28;
+    }
+
+    .couple {
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #806b5c;
+      margin-bottom: 14px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #756963;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: rgba(255, 253, 250, 0.96);
+      border-radius: 26px;
+      padding: 27px 21px;
+      box-shadow:
+        0 18px 50px rgba(80, 60, 45, 0.10),
+        0 2px 8px rgba(80, 60, 45, 0.04);
+      border: 1px solid rgba(174, 150, 130, 0.16);
+    }
+
+    .upload-area {
+      border: 1.5px dashed #cbbcaf;
+      border-radius: 20px;
+      padding: 27px 16px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .camera {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .upload-title {
+      font-family: Georgia, serif;
+      font-size: 21px;
+      margin-bottom: 8px;
+    }
+
+    .upload-text {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #8a7d76;
+      margin-bottom: 22px;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 7px;
+      color: #5f554f;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #ddd2ca;
+      border-radius: 13px;
+      padding: 13px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+      color: #332b28;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #a58e7d;
+      box-shadow: 0 0 0 3px rgba(165, 142, 125, 0.08);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .button {
+      display: block;
+      width: 100%;
+      border: none;
+      border-radius: 13px;
+      padding: 14px 18px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      text-align: center;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .photo-button {
+      background: #332b28;
+      color: white;
+      margin-top: 7px;
+    }
+
+    .video-button {
+      background: #806b5c;
+      color: white;
+      margin-top: 10px;
+    }
+
+    .share-button {
+      background: #b09a87;
+      color: white;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .gallery-button {
+      margin-top: 13px;
+      background: #eee5dc;
+      color: #332b28;
+    }
+
+    .file-name {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #8a7d76;
+      margin-top: 12px;
+      word-break: break-word;
+      text-align: left;
+    }
+
+    .status {
+      margin-top: 15px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .gallery {
+      margin-top: 28px;
+      display: none;
+    }
+
+    .gallery h2 {
+      font-family: Georgia, serif;
+      font-size: 27px;
+      font-weight: normal;
+      margin: 0 0 18px;
+    }
+
+    .photo-card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 19px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      box-shadow: 0 7px 25px rgba(80, 60, 45, 0.09);
+      text-align: left;
+    }
+
+    .photo-card img,
+    .photo-card video {
+      width: 100%;
+      display: block;
+      max-height: 520px;
+      object-fit: cover;
+      background: #eee8e1;
+    }
+
+    .photo-card video {
+      max-height: 600px;
+    }
+
+    .photo-info {
+      padding: 15px;
+    }
+
+    .photo-name {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 7px;
+    }
+
+    .photo-note {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #756963;
+    }
+
+    .empty {
+      color: #8a7d76;
+      font-size: 13px;
+      padding: 15px;
+    }
+
+    .footer {
+      margin-top: 28px;
+      font-size: 10px;
+      color: #a0958e;
+      letter-spacing: 2px;
+    }
+
+    .divider {
+      width: 55px;
+      height: 1px;
+      background: #cbbcaf;
+      margin: 18px auto;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">
+    Atelier Memoria
+  </div>
+
+  <div class="ornament">
+    ✦ · ✦
+  </div>
+
+  <h1>
+    Anılar burada başlar.
+  </h1>
+
+  <div class="couple">
+    Büşra &amp; Yaşar Wedding
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="subtitle">
+    Bu özel güne ait fotoğraf ve videolarınızı<br>
+    bizimle paylaşın, bu güzel anılara ortak olun.
+  </div>
+
+  <div class="card">
+
+    <div class="upload-area">
+
+      <div class="camera">
+        📸
+      </div>
+
+      <div class="upload-title">
+        Anınızı bırakın
+      </div>
+
+      <div class="upload-text">
+        Birden fazla fotoğraf ve video seçebilirsiniz.
+        Dilerseniz adınızı ve güzel bir notunuzu da bırakabilirsiniz.
+      </div>
+
+      <div class="form-group">
+
+        <label for="name">
+          Adınız
+        </label>
+
+        <input
+          type="text"
+          id="name"
+          placeholder="Örn. Büşra"
+          maxlength="60"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label for="note">
+          Notunuz
+        </label>
+
+        <textarea
+          id="note"
+          placeholder="Bu güzel güne küçük bir not bırakın..."
+          maxlength="500"
+        ></textarea>
+
+      </div>
+
+
+      <!-- FOTOĞRAF SEÇ -->
+
+      <label
+        for="photo"
+        class="button photo-button"
+      >
+        📷 Fotoğraf Seç
+      </label>
+
+      <input
+        type="file"
+        id="photo"
+        accept="image/*"
+        multiple
+      >
+
+
+      <!-- VİDEO SEÇ -->
+
+      <label
+        for="video"
+        class="button video-button"
+      >
+        🎥 Video Seç
+      </label>
+
+      <input
+        type="file"
+        id="video"
+        accept="video/*"
+        multiple
+      >
+
+
+      <!-- SEÇİLEN DOSYALAR -->
+
+      <div
+        id="fileName"
+        class="file-name"
+      >
+        Henüz fotoğraf veya video seçilmedi.
+      </div>
+
+
+      <!-- PAYLAŞ -->
+
+      <button
+        id="uploadButton"
+        class="button share-button"
+        type="button"
+      >
+        ✨ Fotoğraf ve Videoları Paylaş
+      </button>
+
+
+      <div
+        id="status"
+        class="status"
+      ></div>
+
+    </div>
+
+
+    <!-- GALERİ -->
+
+    <button
+      id="galleryButton"
+      class="button gallery-button"
+      type="button"
+    >
+      🖼️ Anıları Gör
+    </button>
+
+  </div>
+
+
+  <div
+    id="gallery"
+    class="gallery"
+  >
+
+    <h2>
+      Bu Günden Kalanlar
+    </h2>
+
+    <div id="galleryContent"></div>
+
+  </div>
+
+
+  <div class="footer">
+    ATELIER MEMORIA • YOUR MOMENTS, FOREVER
+  </div>
+
+</div>
+
+
+<script>
+
+  /* =====================================================
+     SUPABASE
+  ===================================================== */
+
+  const SUPABASE_URL =
+    "https://hokwiohkbceiyffqwrbn.supabase.co";
+
+  const SUPABASE_ANON_KEY =
+    "sb_publishable_6BRruSgb5EKyMhP7CSOwzw_KrcaXOWq";
+
+  const supabaseClient =
+    supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+
+  /* =====================================================
+     ETKİNLİK KODU
+  ===================================================== */
+
+  const urlParams =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const EVENT_CODE =
+    urlParams.get("event") || "demo";
+
+
+  /* =====================================================
+     ELEMENTLER
+  ===================================================== */
+
+  const photoInput =
+    document.getElementById("photo");
+
+  const videoInput =
+    document.getElementById("video");
+
+  const fileName =
+    document.getElementById("fileName");
+
+  const nameInput =
+    document.getElementById("name");
+
+  const noteInput =
+    document.getElementById("note");
+
+  const uploadButton =
+    document.getElementById("uploadButton");
+
+  const galleryButton =
+    document.getElementById("galleryButton");
+
+  const status =
+    document.getElementById("status");
+
+  const gallery =
+    document.getElementById("gallery");
+
+  const galleryContent =
+    document.getElementById("galleryContent");
+
+
+  /* =====================================================
+     SEÇİLEN DOSYALARI GÖSTER
+  ===================================================== */
+
+  function updateSelectedFiles() {
+
+    const photos =
+      Array.from(photoInput.files || []);
+
+    const videos =
+      Array.from(videoInput.files || []);
+
+    const total =
+      photos.length + videos.length;
+
+    if (total === 0) {
+
+      fileName.textContent =
+        "Henüz fotoğraf veya video seçilmedi.";
+
+      return;
+    }
+
+    let text = "";
+
+    if (photos.length > 0) {
+
+      text +=
+        "📷 " +
+        photos.length +
+        " fotoğraf seçildi";
+
+    }
+
+    if (
+      photos.length > 0 &&
+      videos.length > 0
+    ) {
+
+      text += "  •  ";
+
+    }
+
+    if (videos.length > 0) {
+
+      text +=
+        "🎥 " +
+        videos.length +
+        " video seçildi";
+
+    }
+
+    fileName.textContent = text;
+
   }
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: Arial, sans-serif;
-    color: #332b28;
-    padding: 30px 18px;
 
-    background-color: #f7f3ee;
+  photoInput.addEventListener(
+    "change",
+    updateSelectedFiles
+  );
 
-    /* Zarif botanik desen */
-    background-image:
-      radial-gradient(
-        circle at 10% 15%,
-        rgba(139, 117, 103, 0.10) 0,
-        rgba(139, 117, 103, 0.10) 2px,
-        transparent 3px
-      ),
-      radial-gradient(
-        circle at 90% 80%,
-        rgba(139, 117, 103, 0.08) 0,
-        rgba(139, 117, 103, 0.08) 2px,
-        transparent 3px
-      ),
-      linear-gradient(
-        135deg,
-        transparent 0%,
-        rgba(160, 137, 120, 0.035) 45%,
-        transparent 46%
+
+  videoInput.addEventListener(
+    "change",
+    updateSelectedFiles
+  );
+
+
+  /* =====================================================
+     PAYLAŞ
+  ===================================================== */
+
+  uploadButton.addEventListener(
+    "click",
+    async function() {
+
+      const photos =
+        Array.from(photoInput.files || []);
+
+      const videos =
+        Array.from(videoInput.files || []);
+
+      const files =
+        photos.concat(videos);
+
+
+      const name =
+        nameInput.value.trim();
+
+      const note =
+        noteInput.value.trim();
+
+
+      /* DOSYA KONTROLÜ */
+
+      if (files.length === 0) {
+
+        status.textContent =
+          "Lütfen önce fotoğraf veya video seçin.";
+
+        return;
+      }
+
+
+      /* İSİM KONTROLÜ */
+
+      if (!name) {
+
+        status.textContent =
+          "Lütfen adınızı yazın.";
+
+        nameInput.focus();
+
+        return;
+      }
+
+
+      /* DOSYA BOYUT KONTROLÜ */
+
+      for (const file of files) {
+
+        if (
+          file.size >
+          50 * 1024 * 1024
+        ) {
+
+          status.textContent =
+            "Her dosya 50 MB'dan küçük olmalı: " +
+            file.name;
+
+          return;
+        }
+
+      }
+
+
+      uploadButton.disabled = true;
+
+      uploadButton.textContent =
+        "Dosyalar yükleniyor...";
+
+      status.textContent =
+        "Lütfen bekleyin...";
+
+
+      try {
+
+        let uploadedCount = 0;
+
+
+        /* =================================================
+           TÜM DOSYALARI TEK TEK YÜKLE
+        ================================================= */
+
+        for (const file of files) {
+
+          const extension =
+            file.name
+              .split(".")
+              .pop()
+              .toLowerCase();
+
+
+          const uniqueFileName =
+            Date.now() +
+            "-" +
+            crypto.randomUUID() +
+            "." +
+            extension;
+
+
+          const filePath =
+            EVENT_CODE +
+            "/" +
+            uniqueFileName;
+
+
+          /* STORAGE */
+
+          const {
+            error: uploadError
+          } =
+            await supabaseClient
+              .storage
+              .from("event-files")
+              .upload(
+                filePath,
+                file,
+                {
+                  contentType: file.type,
+                  upsert: false
+                }
+              );
+
+
+          if (uploadError) {
+
+            throw uploadError;
+
+          }
+
+
+          /* PUBLIC URL */
+
+          const {
+            data: publicUrlData
+          } =
+            supabaseClient
+              .storage
+              .from("event-files")
+              .getPublicUrl(
+                filePath
+              );
+
+
+          const fileUrl =
+            publicUrlData.publicUrl;
+
+
+          /* VERİTABANI */
+
+          const {
+            error: databaseError
+          } =
+            await supabaseClient
+              .from("event_photos")
+              .insert({
+
+                event_code:
+                  EVENT_CODE,
+
+                file_path:
+                  filePath,
+
+                file_url:
+                  fileUrl,
+
+                uploader_name:
+                  name,
+
+                note:
+                  note || null
+
+              });
+
+
+          if (databaseError) {
+
+            throw databaseError;
+
+          }
+
+
+          uploadedCount++;
+
+          status.textContent =
+            uploadedCount +
+            " / " +
+            files.length +
+            " dosya yüklendi...";
+
+        }
+
+
+        /* BAŞARILI */
+
+        status.textContent =
+          "✨ " +
+          uploadedCount +
+          " dosyanız başarıyla paylaşıldı.";
+
+
+        /* FORMU TEMİZLE */
+
+        photoInput.value = "";
+
+        videoInput.value = "";
+
+        nameInput.value = "";
+
+        noteInput.value = "";
+
+        fileName.textContent =
+          "Henüz fotoğraf veya video seçilmedi.";
+
+
+        uploadButton.textContent =
+          "✨ Fotoğraf ve Videoları Paylaş";
+
+
+        /* GALERİYİ GÜNCELLE */
+
+        await loadGallery();
+
+
+      } catch (error) {
+
+        console.error(
+          "Yükleme hatası:",
+          error
+        );
+
+        status.textContent =
+          "Bir sorun oluştu. Lütfen tekrar deneyin.";
+
+
+        uploadButton.textContent =
+          "✨ Fotoğraf ve Videoları Paylaş";
+
+      }
+
+
+      uploadButton.disabled = false;
+
+    }
+  );
+
+
+  /* =====================================================
+     GALERİ BUTONU
+  ===================================================== */
+
+  galleryButton.addEventListener(
+    "click",
+    loadGallery
+  );
+
+
+  /* =====================================================
+     GALERİYİ YÜKLE
+  ===================================================== */
+
+  async function loadGallery() {
+
+    gallery.style.display =
+      "block";
+
+    galleryContent.innerHTML =
+      '<div class="empty">Anılar yükleniyor...</div>';
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("event_photos")
+        .select("*")
+        .eq(
+          "event_code",
+          EVENT_CODE
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
+
+
+    if (error) {
+
+      console.error(
+        "Galeri hatası:",
+        error
       );
 
-    background-size:
-      55px 55px,
-      70px 70px,
-      100% 100%;
+      galleryContent.innerHTML =
+        '<div class="empty">Anılar yüklenemedi.</div>';
+
+      return;
+
+    }
+
+
+    if (
+      !data ||
+      data.length === 0
+    ) {
+
+      galleryContent.innerHTML =
+        '<div class="empty">Henüz anı paylaşılmamış.</div>';
+
+      return;
+
+    }
+
+
+    galleryContent.innerHTML =
+      "";
+
+
+    /* =================================================
+       HER DOSYAYI GÖSTER
+    ================================================= */
+
+    data.forEach(
+      function(item) {
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+        card.className =
+          "photo-card";
+
+
+        const isVideo =
+          item.file_path
+            .toLowerCase()
+            .match(
+              /\.(mp4|mov|webm|avi|m4v)$/i
+            );
+
+
+        let media;
+
+
+        /* VİDEO */
+
+        if (isVideo) {
+
+          media =
+            document.createElement(
+              "video"
+            );
+
+          media.src =
+            item.file_url;
+
+          media.controls = true;
+
+          media.playsInline = true;
+
+          media.preload = "metadata";
+
+        }
+
+
+        /* FOTOĞRAF */
+
+        else {
+
+          media =
+            document.createElement(
+              "img"
+            );
+
+          media.src =
+            item.file_url;
+
+          media.alt =
+            "Atelier Memoria";
+
+          media.loading =
+            "lazy";
+
+        }
+
+
+        const info =
+          document.createElement(
+            "div"
+          );
+
+        info.className =
+          "photo-info";
+
+
+        const person =
+          document.createElement(
+            "div"
+          );
+
+        person.className =
+          "photo-name";
+
+        person.textContent =
+          "♡ " +
+          (
+            item.uploader_name ||
+            "Anonim"
+          );
+
+
+        info.appendChild(
+          person
+        );
+
+
+        if (item.note) {
+
+          const note =
+            document.createElement(
+              "div"
+            );
+
+          note.className =
+            "photo-note";
+
+          note.textContent =
+            item.note;
+
+          info.appendChild(
+            note
+          );
+
+        }
+
+
+        card.appendChild(
+          media
+        );
+
+        card.appendChild(
+          info
+        );
+
+        galleryContent.appendChild(
+          card
+        );
+
+      }
+    );
+
   }
 
-  .container {
-    width: 100%;
-    max-width: 520px;
-    margin: auto;
-    text-align: center;
-  }
+</script>
 
-  .logo {
-    font-size: 11px;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    color: #8a7567;
-    margin-bottom: 28px;
-  }
-
-  h1 {
-    font-family: Georgia, serif;
-    font-size: 34px;
-    font-weight: normal;
-    line-height: 1.2;
-    margin: 0 0 8px;
-    color: #332b28;
-  }
-
-  .subtitle {
-    font-family: Georgia, serif;
-    font-size: 14px;
-    line-height: 1.8;
-    color: #756963;
-    margin-bottom: 30px;
-  }
-
-  .card {
-    background: rgba(255, 255, 255, 0.96);
-    border-radius: 26px;
-    padding: 30px 22px;
-    box-shadow:
-      0 15px 45px rgba(80, 60, 45, 0.10);
-    border: 1px solid rgba(180, 155, 135, 0.18);
-  }
-
-  .upload-area {
-    border: 1px solid #d8c9bc;
-    border-radius: 20px;
-    padding: 28px 16px;
-    background: rgba(250, 247, 243, 0.75);
-  }
-
-  .camera {
-    font-size: 38px;
-    margin-bottom: 12px;
-  }
-
-  .couple-name {
-    font-family: Georgia, serif;
-    font-size: 27px;
-    font-weight: normal;
-    color: #332b28;
-    margin-bottom: 8px;
-  }
-
-  .upload-title {
-    font-family: Georgia, serif;
-    font-size: 19px;
-    margin-bottom: 7px;
-  }
-
-  .upload-text {
-    font-size: 13px;
-    line-height: 1.7;
-    color: #8a7d76;
-    margin-bottom: 24px;
-  }
-
-  .form-group {
-    text-align: left;
-    margin-bottom: 16px;
-  }
-
-  .form-group label {
-    display: block;
-    font-size: 12px;
-    letter-spacing: 0.3px;
-    margin-bottom: 7px;
-    color: #5f554f;
-  }
-
-  input,
-  textarea {
-    width: 100%;
-    border: 1px solid #ddd2ca;
-    border-radius: 13px;
-    padding: 13px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    outline: none;
-    background: #fff;
-  }
-
-  textarea {
-    min-height: 90px;
-    resize: vertical;
-  }
-
-  input:focus,
-  textarea:focus {
-    border-color: #a99382;
-  }
-
-  input[type="file"] {
-    display: none;
-  }
-
-  .button {
-    display: inline-block;
-    width: 100%;
-    border: none;
-    border-radius: 13px;
-    padding: 14px 20px;
-    font-size: 14px;
-    cursor: pointer;
-    text-align: center;
-    transition: 0.2s ease;
-  }
-
-  .button:hover {
-    transform: translateY(-1px);
-  }
-
-  .button:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
-
-  .upload-button {
-    margin-top: 8px;
-    background: #332b28;
-    color: white;
-  }
-
-  .video-button {
-    background: #756154;
-  }
-
-  .gallery-button {
-    margin-top: 14px;
-    background: #eee5dc;
-    color: #332b28;
-  }
-
-  .file-name {
-    font-size: 12px;
-    color: #8a7d76;
-    margin-top: 12px;
-    line-height: 1.6;
-  }
-
-  .selected-list {
-    text-align: left;
-    margin-top: 10px;
-    font-size: 12px;
-    color: #756963;
-    line-height: 1.7;
-  }
-
-  .status {
-    margin-top: 15px;
-    font-size: 13px;
-    line-height: 1.5;
-  }
-
-  .gallery {
-    margin-top: 30px;
-    display: none;
-  }
-
-  .gallery h2 {
-    font-family: Georgia, serif;
-    font-size: 26px;
-    font-weight: normal;
-    margin-bottom: 20px;
-  }
-
-  .photo-card {
-    background: white;
-    border-radius: 20px;
-    overflow: hidden;
-    margin-bottom: 20px;
-    box-shadow:
-      0 7px 25px rgba(80, 60, 45, 0.08);
-    text-align: left;
-  }
-
-  .photo-card img,
-  .photo-card video {
-    width: 100%;
-    display: block;
-    max-height: 550px;
-    object-fit: cover;
-    background: #000;
-  }
-
-  .photo-card video {
-    object-fit: contain;
-  }
-
-  .photo-info {
-    padding: 16px;
-  }
-
-  .photo-name {
-    font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 7px;
-  }
-
-  .photo-note {
-    font-size: 13px;
-    line-height: 1.6;
-    color: #756963;
-  }
-
-  .empty {
-    color: #8a7d76;
-    font-size: 13px;
-    padding: 15px;
-  }
-
-  .footer {
-    margin-top: 30px;
-    font-size: 10px;
-    color: #a0958e;
-    letter-spacing: 2px;
-  }
-</style>
+</body>
+</html>
