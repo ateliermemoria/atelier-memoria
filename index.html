@@ -128,14 +128,24 @@
       padding: 14px 20px;
       font-size: 15px;
       cursor: pointer;
+      text-align: center;
     }
 
     .button:hover {
       opacity: 0.9;
     }
 
+    .button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     .upload-button {
-      margin-top: 5px;
+      margin-top: 8px;
+    }
+
+    .video-button {
+      background: #6f5a4e;
     }
 
     .gallery-button {
@@ -149,6 +159,7 @@
       color: #8a7d76;
       margin-top: 10px;
       word-break: break-word;
+      line-height: 1.5;
     }
 
     .status {
@@ -178,11 +189,17 @@
       text-align: left;
     }
 
-    .photo-card img {
+    .photo-card img,
+    .photo-card video {
       width: 100%;
       display: block;
       max-height: 500px;
       object-fit: cover;
+      background: #000;
+    }
+
+    .photo-card video {
+      max-height: 600px;
     }
 
     .photo-info {
@@ -213,10 +230,6 @@
       color: #a0958e;
       letter-spacing: 1px;
     }
-
-    .hidden {
-      display: none;
-    }
   </style>
 </head>
 
@@ -229,7 +242,7 @@
   <h1>Anılar burada başlar.</h1>
 
   <div class="subtitle">
-    Bu özel güne ait fotoğraflarınızı<br>
+    Bu özel güne ait fotoğraf ve videolarınızı<br>
     bizimle paylaşın ve anılara ortak olun.
   </div>
 
@@ -240,15 +253,17 @@
       <div class="camera">📸</div>
 
       <div class="upload-title">
-        Fotoğrafınızı paylaşın
+        Anınızı paylaşın
       </div>
 
       <div class="upload-text">
-        Fotoğrafınızı seçin, adınızı ve dilerseniz bir not bırakın.
+        Fotoğrafınızı veya videonuzu seçin,<br>
+        adınızı ve dilerseniz bir not bırakın.
       </div>
 
       <div class="form-group">
         <label for="name">Adınız</label>
+
         <input
           type="text"
           id="name"
@@ -259,6 +274,7 @@
 
       <div class="form-group">
         <label for="note">Notunuz</label>
+
         <textarea
           id="note"
           placeholder="Bu güzel güne küçük bir not bırakın..."
@@ -266,60 +282,99 @@
         ></textarea>
       </div>
 
-      <label for="photo" class="button upload-button">
-    📷 Fotoğraf Seç
-</label>
 
-<input
-    type="file"
-    id="photo"
-    accept="image/*,video/*"
->
-      
+      <!-- FOTOĞRAF SEÇ -->
 
-<label for="video" class="button upload-button">
-    🎥 Video Seç
-</label>
+      <label
+        for="photo"
+        class="button upload-button"
+      >
+        📷 Fotoğraf Seç
+      </label>
 
-<input
-    type="file"
-    id="video"
-    accept="video/*"
->
+      <input
+        type="file"
+        id="photo"
+        accept="image/*"
+      >
 
-      <div id="fileName" class="file-name">
-        Henüz fotoğraf seçilmedi.
-      </div>
+
+      <!-- FOTOĞRAF PAYLAŞ -->
 
       <button
-        id="uploadButton"
+        id="photoUploadButton"
         class="button upload-button"
         type="button"
       >
-        Fotoğrafı Paylaş
+        📷 Fotoğrafı Paylaş
       </button>
 
-      <div id="status" class="status"></div>
+
+      <!-- VİDEO SEÇ -->
+
+      <label
+        for="video"
+        class="button upload-button video-button"
+      >
+        🎥 Video Seç
+      </label>
+
+      <input
+        type="file"
+        id="video"
+        accept="video/*"
+      >
+
+
+      <!-- VİDEO PAYLAŞ -->
+
+      <button
+        id="videoUploadButton"
+        class="button upload-button video-button"
+        type="button"
+      >
+        🎥 Videoyu Paylaş
+      </button>
+
+
+      <div
+        id="fileName"
+        class="file-name"
+      >
+        Henüz dosya seçilmedi.
+      </div>
+
+
+      <div
+        id="status"
+        class="status"
+      ></div>
 
     </div>
+
 
     <button
       id="galleryButton"
       class="button gallery-button"
       type="button"
     >
-      🖼️ Fotoğrafları Gör
+      🖼️ Fotoğrafları ve Videoları Gör
     </button>
 
   </div>
 
-  <div id="gallery" class="gallery">
+
+  <div
+    id="gallery"
+    class="gallery"
+  >
 
     <h2>Bu Günden Kalanlar</h2>
 
     <div id="galleryContent"></div>
 
   </div>
+
 
   <div class="footer">
     ATELIER MEMORIA • YOUR MOMENTS, FOREVER
@@ -339,7 +394,6 @@
 
   const SUPABASE_ANON_KEY =
     "sb_publishable_6BRruSgb5EKyMhP7CSOwzw_KrcaXOWq";
-
 
   const supabaseClient =
     supabase.createClient(
@@ -366,9 +420,9 @@
   const photoInput =
     document.getElementById("photo");
 
-const videoInput =
+  const videoInput =
     document.getElementById("video");
-  
+
   const fileName =
     document.getElementById("fileName");
 
@@ -378,8 +432,11 @@ const videoInput =
   const noteInput =
     document.getElementById("note");
 
-  const uploadButton =
-    document.getElementById("uploadButton");
+  const photoUploadButton =
+    document.getElementById("photoUploadButton");
+
+  const videoUploadButton =
+    document.getElementById("videoUploadButton");
 
   const galleryButton =
     document.getElementById("galleryButton");
@@ -398,31 +455,61 @@ const videoInput =
      FOTOĞRAF SEÇİLDİ
      ========================================== */
 
-  photoInput.addEventListener("change", function() {
+  photoInput.addEventListener(
+    "change",
+    function() {
 
-    if (this.files.length > 0) {
+      if (this.files.length > 0) {
 
-      fileName.textContent =
-        "Seçilen fotoğraf: " +
-        this.files[0].name;
+        fileName.textContent =
+          "📷 Seçilen fotoğraf: " +
+          this.files[0].name;
 
-    } else {
+        status.textContent = "";
 
-      fileName.textContent =
-        "Henüz fotoğraf seçilmedi.";
+      } else {
+
+        fileName.textContent =
+          "Henüz dosya seçilmedi.";
+
+      }
 
     }
-
-  });
+  );
 
 
   /* ==========================================
-     FOTOĞRAF YÜKLE
+     VİDEO SEÇİLDİ
      ========================================== */
 
-  uploadButton.addEventListener("click", async function() {
+  videoInput.addEventListener(
+    "change",
+    function() {
 
-  const file = photoInput.files[0];
+      if (this.files.length > 0) {
+
+        fileName.textContent =
+          "🎥 Seçilen video: " +
+          this.files[0].name;
+
+        status.textContent = "";
+
+      } else {
+
+        fileName.textContent =
+          "Henüz dosya seçilmedi.";
+
+      }
+
+    }
+  );
+
+
+  /* ==========================================
+     ORTAK YÜKLEME FONKSİYONU
+     ========================================== */
+
+  async function uploadFile(file, type) {
 
     const name =
       nameInput.value.trim();
@@ -431,15 +518,21 @@ const videoInput =
       noteInput.value.trim();
 
 
+    /* DOSYA KONTROLÜ */
+
     if (!file) {
 
       status.textContent =
-        "Lütfen önce bir fotoğraf seçin.";
+        type === "photo"
+          ? "Lütfen önce bir fotoğraf seçin."
+          : "Lütfen önce bir video seçin.";
 
       return;
 
     }
 
+
+    /* İSİM KONTROLÜ */
 
     if (!name) {
 
@@ -453,61 +546,113 @@ const videoInput =
     }
 
 
-   if (
-    !file.type.startsWith("image/") &&
-    !file.type.startsWith("video/")
-) {
-    status.textContent = "Lütfen fotoğraf veya video yükleyin.";
-    return;
-}
+    /* DOSYA TÜRÜ KONTROLÜ */
+
+    if (type === "photo") {
+
+      if (!file.type.startsWith("image/")) {
+
+        status.textContent =
+          "Lütfen geçerli bir fotoğraf seçin.";
+
+        return;
+
+      }
+
+    }
+
+
+    if (type === "video") {
+
+      if (!file.type.startsWith("video/")) {
+
+        status.textContent =
+          "Lütfen geçerli bir video seçin.";
+
+        return;
+
+      }
+
+    }
+
+
+    /* DOSYA BOYUTU */
+
+    const maxSize =
+      type === "photo"
+        ? 10 * 1024 * 1024
+        : 100 * 1024 * 1024;
+
+
+    if (file.size > maxSize) {
 
       status.textContent =
-        "Lütfen yalnızca fotoğraf veya video yükleyin.";
+        type === "photo"
+          ? "Fotoğraf 10 MB'dan küçük olmalı."
+          : "Video 100 MB'dan küçük olmalı.";
 
       return;
 
     }
 
 
-    if (file.size > 10 * 1024 * 1024) {
+    /* BUTONLARI KİLİTLE */
 
-      status.textContent =
-        "Fotoğraf 10 MB'dan küçük olmalı.";
+    photoUploadButton.disabled = true;
+    videoUploadButton.disabled = true;
 
-      return;
+
+    if (type === "photo") {
+
+      photoUploadButton.textContent =
+        "📷 Fotoğraf yükleniyor...";
+
+    } else {
+
+      videoUploadButton.textContent =
+        "🎥 Video yükleniyor...";
 
     }
 
 
-    uploadButton.disabled = true;
-
-    uploadButton.textContent =
-      "Dosya yükleniyor...";
-
-    status.textContent = "";
+    status.textContent =
+      "Dosyanız yükleniyor...";
 
 
     try {
 
+      /* DOSYA UZANTISI */
+
       const extension =
-        file.name.split(".").pop();
+        file.name.includes(".")
+          ? file.name.split(".").pop().toLowerCase()
+          : "";
 
 
-      const fileName =
+      /* BENZERSİZ DOSYA ADI */
+
+      const generatedFileName =
         Date.now() +
         "-" +
         crypto.randomUUID() +
-        "." +
-        extension;
+        (extension ? "." + extension : "");
 
+
+      /* EVENT KLASÖRÜ */
 
       const filePath =
-        EVENT_CODE + "/" + fileName;
+        EVENT_CODE +
+        "/" +
+        generatedFileName;
 
 
-      /* FOTOĞRAFI STORAGE'A YÜKLE */
+      /* ==========================================
+         SUPABASE STORAGE'A YÜKLE
+         ========================================== */
 
-      const { error: uploadError } =
+      const {
+        error: uploadError
+      } =
         await supabaseClient
           .storage
           .from("event-files")
@@ -528,9 +673,13 @@ const videoInput =
       }
 
 
-      /* FOTOĞRAFIN PUBLIC URL'SİNİ AL */
+      /* ==========================================
+         PUBLIC URL
+         ========================================== */
 
-      const { data: publicUrlData } =
+      const {
+        data: publicUrlData
+      } =
         supabaseClient
           .storage
           .from("event-files")
@@ -541,22 +690,31 @@ const videoInput =
         publicUrlData.publicUrl;
 
 
-      /* BİLGİLERİ TABLOYA KAYDET */
+      /* ==========================================
+         DATABASE'E KAYDET
+         ========================================== */
 
-      const { error: databaseError } =
+      const {
+        error: databaseError
+      } =
         await supabaseClient
           .from("event_photos")
           .insert({
 
-            event_code: EVENT_CODE,
+            event_code:
+              EVENT_CODE,
 
-            file_path: filePath,
+            file_path:
+              filePath,
 
-            file_url: fileUrl,
+            file_url:
+              fileUrl,
 
-            uploader_name: name,
+            uploader_name:
+              name,
 
-            note: note || null
+            note:
+              note || null
 
           });
 
@@ -568,22 +726,26 @@ const videoInput =
       }
 
 
-      status.textContent =
-        "✨ Fotoğrafınız ve notunuz başarıyla paylaşıldı.";
+      /* ==========================================
+         BAŞARILI
+         ========================================== */
 
+      status.textContent =
+        type === "photo"
+          ? "✨ Fotoğrafınız başarıyla paylaşıldı."
+          : "✨ Videonuz başarıyla paylaşıldı.";
+
+
+      /* FORMU TEMİZLE */
 
       photoInput.value = "";
+      videoInput.value = "";
 
       nameInput.value = "";
-
       noteInput.value = "";
 
       fileName.textContent =
-        "Henüz fotoğraf seçilmedi.";
-
-
-      uploadButton.textContent =
-        "Fotoğrafı Paylaş";
+        "Henüz dosya seçilmedi.";
 
 
       /* GALERİYİ YENİLE */
@@ -593,20 +755,70 @@ const videoInput =
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Yükleme hatası:",
+        error
+      );
 
       status.textContent =
         "Bir sorun oluştu. Lütfen tekrar deneyin.";
 
-      uploadButton.textContent =
-        "Fotoğrafı Paylaş";
-
     }
 
 
-    uploadButton.disabled = false;
+    /* BUTONLARI AÇ */
 
-  });
+    photoUploadButton.disabled = false;
+    videoUploadButton.disabled = false;
+
+
+    photoUploadButton.textContent =
+      "📷 Fotoğrafı Paylaş";
+
+    videoUploadButton.textContent =
+      "🎥 Videoyu Paylaş";
+
+  }
+
+
+  /* ==========================================
+     FOTOĞRAF PAYLAŞ BUTONU
+     ========================================== */
+
+  photoUploadButton.addEventListener(
+    "click",
+    async function() {
+
+      const file =
+        photoInput.files[0];
+
+      await uploadFile(
+        file,
+        "photo"
+      );
+
+    }
+  );
+
+
+  /* ==========================================
+     VİDEO PAYLAŞ BUTONU
+     ========================================== */
+
+  videoUploadButton.addEventListener(
+    "click",
+    async function() {
+
+      const file =
+        videoInput.files[0];
+
+      await uploadFile(
+        file,
+        "video"
+      );
+
+    }
+  );
 
 
   /* ==========================================
@@ -621,20 +833,31 @@ const videoInput =
 
   async function loadGallery() {
 
-    gallery.style.display = "block";
+    gallery.style.display =
+      "block";
+
 
     galleryContent.innerHTML =
-      '<div class="empty">Fotoğraflar yükleniyor...</div>';
+      '<div class="empty">Anılar yükleniyor...</div>';
 
 
-    const { data, error } =
+    const {
+      data,
+      error
+    } =
       await supabaseClient
         .from("event_photos")
         .select("*")
-        .eq("event_code", EVENT_CODE)
-        .order("created_at", {
-          ascending: false
-        });
+        .eq(
+          "event_code",
+          EVENT_CODE
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
 
 
     if (error) {
@@ -642,7 +865,7 @@ const videoInput =
       console.error(error);
 
       galleryContent.innerHTML =
-        '<div class="empty">Fotoğraflar yüklenemedi.</div>';
+        '<div class="empty">Anılar yüklenemedi.</div>';
 
       return;
 
@@ -652,17 +875,18 @@ const videoInput =
     if (!data || data.length === 0) {
 
       galleryContent.innerHTML =
-        '<div class="empty">Henüz fotoğraf paylaşılmamış.</div>';
+        '<div class="empty">Henüz fotoğraf veya video paylaşılmamış.</div>';
 
       return;
 
     }
 
 
-    galleryContent.innerHTML = "";
+    galleryContent.innerHTML =
+      "";
 
 
-    data.forEach(photo => {
+    data.forEach(item => {
 
       const card =
         document.createElement("div");
@@ -671,15 +895,72 @@ const videoInput =
         "photo-card";
 
 
-      const image =
-        document.createElement("img");
+      /* ==========================================
+         DOSYA TÜRÜNÜ UZANTIDAN ANLA
+         ========================================== */
 
-      image.src =
-        photo.file_url;
+      const filePath =
+        (item.file_path || "")
+          .toLowerCase();
 
-      image.alt =
-        "Atelier Memoria";
 
+      const isVideo =
+        filePath.endsWith(".mp4") ||
+        filePath.endsWith(".mov") ||
+        filePath.endsWith(".webm") ||
+        filePath.endsWith(".m4v") ||
+        filePath.endsWith(".avi") ||
+        filePath.endsWith(".mkv");
+
+
+      /* ==========================================
+         MEDYA
+         ========================================== */
+
+      if (isVideo) {
+
+        const video =
+          document.createElement("video");
+
+        video.src =
+          item.file_url;
+
+        video.controls =
+          true;
+
+        video.playsInline =
+          true;
+
+        video.preload =
+          "metadata";
+
+
+        card.appendChild(
+          video
+        );
+
+      } else {
+
+        const image =
+          document.createElement("img");
+
+        image.src =
+          item.file_url;
+
+        image.alt =
+          "Atelier Memoria";
+
+
+        card.appendChild(
+          image
+        );
+
+      }
+
+
+      /* ==========================================
+         BİLGİLER
+         ========================================== */
 
       const info =
         document.createElement("div");
@@ -695,7 +976,8 @@ const videoInput =
         "photo-name";
 
       person.textContent =
-        "♡ " + photo.uploader_name;
+        "♡ " +
+        (item.uploader_name || "Anonim");
 
 
       const note =
@@ -705,24 +987,31 @@ const videoInput =
         "photo-note";
 
       note.textContent =
-        photo.note || "";
+        item.note || "";
 
 
-      info.appendChild(person);
+      info.appendChild(
+        person
+      );
 
-      if (photo.note) {
 
-        info.appendChild(note);
+      if (item.note) {
+
+        info.appendChild(
+          note
+        );
 
       }
 
 
-      card.appendChild(image);
+      card.appendChild(
+        info
+      );
 
-      card.appendChild(info);
 
-
-      galleryContent.appendChild(card);
+      galleryContent.appendChild(
+        card
+      );
 
     });
 
