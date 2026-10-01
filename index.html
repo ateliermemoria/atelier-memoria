@@ -220,12 +220,6 @@ input[type="file"]{
   font-weight:bold;
 }
 
-.gallery-button{
-  margin-top:13px;
-  background:#eee5dc;
-  color:#332b28;
-}
-
 .file-name{
   font-size:12px;
   line-height:1.6;
@@ -241,12 +235,86 @@ input[type="file"]{
   line-height:1.6;
 }
 
-.gallery{
-  margin-top:28px;
+.progress{
+  height:7px;
+  background:#eee5dc;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:10px;
   display:none;
 }
 
-.gallery h2{
+.progress-bar{
+  width:0%;
+  height:100%;
+  background:#806b5c;
+  transition:.25s ease;
+}
+
+.success-box{
+  display:none;
+  margin-top:18px;
+  padding:15px;
+  border-radius:15px;
+  background:#f0e8df;
+  color:#5e5148;
+  font-size:13px;
+  line-height:1.6;
+}
+
+/* ÇİFT GİRİŞİ */
+
+.admin-entry{
+  margin-top:22px;
+  text-align:center;
+}
+
+.admin-link{
+  border:none;
+  background:none;
+  color:#9a897c;
+  font-size:11px;
+  cursor:pointer;
+  text-decoration:underline;
+}
+
+.admin-panel{
+  display:none;
+  margin-top:15px;
+  text-align:left;
+  background:#fffaf5;
+  border:1px solid #e3d8ce;
+  border-radius:18px;
+  padding:18px;
+}
+
+.admin-panel h3{
+  font-family:Georgia,serif;
+  font-weight:normal;
+  margin:0 0 15px;
+}
+
+.admin-panel input{
+  margin-bottom:10px;
+}
+
+.admin-button{
+  background:#332b28;
+  color:white;
+}
+
+.logout-button{
+  margin-top:10px;
+  background:#eee5dc;
+  color:#332b28;
+}
+
+.admin-gallery{
+  display:none;
+  margin-top:25px;
+}
+
+.admin-gallery h2{
   font-family:Georgia,serif;
   font-size:27px;
   font-weight:normal;
@@ -267,7 +335,7 @@ input[type="file"]{
   width:100%;
   display:block;
   max-height:520px;
-  object-fit:cover;
+  object-fit:contain;
   background:#eee8e1;
 }
 
@@ -289,6 +357,19 @@ input[type="file"]{
   font-size:13px;
   line-height:1.5;
   color:#756963;
+  margin-bottom:12px;
+}
+
+.download-button{
+  display:block;
+  width:100%;
+  border:none;
+  border-radius:11px;
+  padding:11px;
+  background:#332b28;
+  color:white;
+  cursor:pointer;
+  font-size:13px;
 }
 
 .empty{
@@ -318,10 +399,7 @@ input[type="file"]{
     ✦ · ✦
   </div>
 
-  <div
-    class="couple"
-    id="coupleName"
-  >
+  <div class="couple" id="coupleName">
     Büşra &amp; Yaşar
   </div>
 
@@ -425,26 +503,96 @@ input[type="file"]{
         ✨ Fotoğraf ve Videoları Paylaş
       </button>
 
+      <div class="progress" id="progress">
+        <div
+          class="progress-bar"
+          id="progressBar"
+        ></div>
+      </div>
+
       <div
         id="status"
         class="status"
       ></div>
 
-    </div>
+      <div
+        id="successBox"
+        class="success-box"
+      >
+        ✨ Anınız başarıyla bırakıldı.<br>
+        Bu anıyı yalnızca çift ve Atelier Memoria görebilir.
+      </div>
 
-    <button
-      id="galleryButton"
-      class="button gallery-button"
-      type="button"
-    >
-      🖼️ Anıları Gör
-    </button>
+    </div>
 
   </div>
 
+
+  <!-- SADECE ÇİFT / ATELIER MEMORIA İÇİN -->
+
+  <div class="admin-entry">
+
+    <button
+      id="adminLink"
+      class="admin-link"
+      type="button"
+    >
+      Çift Girişi
+    </button>
+
+    <div
+      id="adminPanel"
+      class="admin-panel"
+    >
+
+      <h3>
+        Özel Anı Galerisi
+      </h3>
+
+      <input
+        id="adminEmail"
+        type="email"
+        placeholder="E-posta"
+        autocomplete="username"
+      >
+
+      <input
+        id="adminPassword"
+        type="password"
+        placeholder="Şifre"
+        autocomplete="current-password"
+      >
+
+      <button
+        id="adminLoginButton"
+        class="button admin-button"
+        type="button"
+      >
+        Giriş Yap
+      </button>
+
+      <button
+        id="logoutButton"
+        class="button logout-button"
+        type="button"
+        style="display:none;"
+      >
+        Çıkış Yap
+      </button>
+
+      <div
+        id="adminStatus"
+        class="status"
+      ></div>
+
+    </div>
+
+  </div>
+
+
   <div
-    id="gallery"
-    class="gallery"
+    id="adminGallery"
+    class="admin-gallery"
   >
 
     <h2>
@@ -454,6 +602,7 @@ input[type="file"]{
     <div id="galleryContent"></div>
 
   </div>
+
 
   <div class="footer">
     ATELIER MEMORIA • YOUR MOMENTS, FOREVER
@@ -482,7 +631,7 @@ const supabaseClient =
 
 
 /* =====================================================
-   EVENT CODE
+   EVENT
 ===================================================== */
 
 const urlParams =
@@ -513,11 +662,9 @@ const coupleNames = {
 };
 
 const coupleNameElement =
-  document.getElementById(
-    "coupleName"
-  );
+  document.getElementById("coupleName");
 
-if (coupleNames[EVENT_CODE]) {
+if(coupleNames[EVENT_CODE]){
 
   coupleNameElement.textContent =
     coupleNames[EVENT_CODE];
@@ -547,29 +694,54 @@ const noteInput =
 const uploadButton =
   document.getElementById("uploadButton");
 
-const galleryButton =
-  document.getElementById("galleryButton");
-
 const status =
   document.getElementById("status");
 
-const gallery =
-  document.getElementById("gallery");
+const progress =
+  document.getElementById("progress");
+
+const progressBar =
+  document.getElementById("progressBar");
+
+const successBox =
+  document.getElementById("successBox");
+
+const adminLink =
+  document.getElementById("adminLink");
+
+const adminPanel =
+  document.getElementById("adminPanel");
+
+const adminEmail =
+  document.getElementById("adminEmail");
+
+const adminPassword =
+  document.getElementById("adminPassword");
+
+const adminLoginButton =
+  document.getElementById("adminLoginButton");
+
+const logoutButton =
+  document.getElementById("logoutButton");
+
+const adminStatus =
+  document.getElementById("adminStatus");
+
+const adminGallery =
+  document.getElementById("adminGallery");
 
 const galleryContent =
-  document.getElementById(
-    "galleryContent"
-  );
+  document.getElementById("galleryContent");
 
 
 /* =====================================================
-   DOSYA BOYUTU
+   DOSYA SINIRLARI
 ===================================================== */
 
 const MAX_FILE_SIZE =
   50 * 1024 * 1024;
 
-const SAFE_VIDEO_SIZE =
+const SAFE_FILE_SIZE =
   45 * 1024 * 1024;
 
 
@@ -604,7 +776,7 @@ function updateSelectedFiles(){
 
   let text = "";
 
-  if(photos.length > 0){
+  if(photos.length){
 
     text +=
       "📷 " +
@@ -614,15 +786,15 @@ function updateSelectedFiles(){
   }
 
   if(
-    photos.length > 0 &&
-    videos.length > 0
+    photos.length &&
+    videos.length
   ){
 
     text += "  •  ";
 
   }
 
-  if(videos.length > 0){
+  if(videos.length){
 
     text +=
       "🎥 " +
@@ -648,50 +820,120 @@ videoInput.addEventListener(
 
 
 /* =====================================================
-   VİDEO SÜRESİNİ ÖĞREN
+   FOTOĞRAF KÜÇÜLTME
+   50 MB üstündeyse otomatik küçültür.
 ===================================================== */
 
-function getVideoDuration(file){
+async function compressImage(file){
 
-  return new Promise(
-    (resolve,reject)=>{
+  if(
+    file.size <= SAFE_FILE_SIZE
+  ){
 
-      const video =
-        document.createElement("video");
+    return file;
 
-      const url =
-        URL.createObjectURL(file);
+  }
 
-      video.preload =
-        "metadata";
+  status.textContent =
+    "📷 Fotoğraf otomatik küçültülüyor...";
 
-      video.onloadedmetadata =
-        function(){
+  const bitmap =
+    await createImageBitmap(file);
 
-          const duration =
-            video.duration;
+  const maxWidth = 2400;
+  const maxHeight = 2400;
 
-          URL.revokeObjectURL(url);
+  let width =
+    bitmap.width;
 
-          resolve(duration);
+  let height =
+    bitmap.height;
 
-        };
+  const ratio =
+    Math.min(
+      1,
+      maxWidth / width,
+      maxHeight / height
+    );
 
-      video.onerror =
-        function(){
+  width =
+    Math.round(width * ratio);
 
-          URL.revokeObjectURL(url);
+  height =
+    Math.round(height * ratio);
 
-          reject(
-            new Error(
-              "Video bilgisi okunamadı."
-            )
-          );
+  const canvas =
+    document.createElement("canvas");
 
-        };
+  canvas.width =
+    width;
 
-      video.src = url;
+  canvas.height =
+    height;
 
+  const ctx =
+    canvas.getContext("2d");
+
+  ctx.drawImage(
+    bitmap,
+    0,
+    0,
+    width,
+    height
+  );
+
+  bitmap.close();
+
+  let quality = .88;
+
+  let blob =
+    await new Promise(resolve =>
+      canvas.toBlob(
+        resolve,
+        "image/jpeg",
+        quality
+      )
+    );
+
+  while(
+    blob &&
+    blob.size > SAFE_FILE_SIZE &&
+    quality > .35
+  ){
+
+    quality -= .10;
+
+    blob =
+      await new Promise(resolve =>
+        canvas.toBlob(
+          resolve,
+          "image/jpeg",
+          quality
+        )
+      );
+
+  }
+
+  if(
+    !blob ||
+    blob.size > MAX_FILE_SIZE
+  ){
+
+    throw new Error(
+      "Fotoğraf 50 MB altına indirilemedi."
+    );
+
+  }
+
+  return new File(
+    [blob],
+    file.name.replace(
+      /\.[^/.]+$/,
+      ""
+    ) + ".jpg",
+    {
+      type:"image/jpeg",
+      lastModified:Date.now()
     }
   );
 
@@ -700,7 +942,6 @@ function getVideoDuration(file){
 
 /* =====================================================
    FFMPEG
-   Büyük videoları tarayıcıda küçültür.
 ===================================================== */
 
 let ffmpeg = null;
@@ -709,7 +950,9 @@ let ffmpegLoaded = false;
 async function loadFFmpeg(){
 
   if(ffmpegLoaded){
+
     return ffmpeg;
+
   }
 
   status.textContent =
@@ -761,46 +1004,24 @@ async function loadFFmpeg(){
 
 
 /* =====================================================
-   BÜYÜK VİDEOYU KÜÇÜLT
+   VİDEO KÜÇÜLTME
 ===================================================== */
 
 async function compressVideo(file){
 
-  if(file.size <= SAFE_VIDEO_SIZE){
+  if(
+    file.size <= SAFE_FILE_SIZE
+  ){
 
     return file;
 
   }
 
   status.textContent =
-    "🎬 Videonuz 50 MB sınırını aştığı için otomatik küçültülüyor...";
-
-  const duration =
-    await getVideoDuration(file);
-
-  if(
-    !duration ||
-    !isFinite(duration)
-  ){
-
-    throw new Error(
-      "Video süresi okunamadı."
-    );
-
-  }
+    "🎬 Video 50 MB sınırını geçtiği için otomatik küçültülüyor...";
 
   const engine =
     await loadFFmpeg();
-
-  const inputName =
-    "input_" +
-    Date.now() +
-    ".mp4";
-
-  const outputName =
-    "compressed_" +
-    Date.now() +
-    ".mp4";
 
   const utilModule =
     await import(
@@ -810,53 +1031,27 @@ async function compressVideo(file){
   const fetchFile =
     utilModule.fetchFile;
 
+  const stamp =
+    Date.now() +
+    "-" +
+    Math.random()
+      .toString(36)
+      .slice(2);
+
+  const inputName =
+    "input-" +
+    stamp +
+    ".mp4";
+
+  const outputName =
+    "output-" +
+    stamp +
+    ".mp4";
+
   await engine.writeFile(
     inputName,
     await fetchFile(file)
   );
-
-
-  /*
-     Yaklaşık 42 MB hedefliyoruz.
-     Böylece Supabase'in 50 MB sınırına
-     yaklaşmadan güvenli pay bırakıyoruz.
-  */
-
-  const targetBytes =
-    42 * 1024 * 1024;
-
-  const targetBits =
-    targetBytes * 8;
-
-  const audioBitrate =
-    96000;
-
-  let videoBitrate =
-    Math.floor(
-      (
-        targetBits /
-        duration
-      ) -
-      audioBitrate
-    );
-
-  /*
-     Çok kısa videolarda bitrate
-     aşırı yükselmesin.
-  */
-
-  videoBitrate =
-    Math.min(
-      videoBitrate,
-      3500000
-    );
-
-  videoBitrate =
-    Math.max(
-      videoBitrate,
-      250000
-    );
-
 
   await engine.exec([
 
@@ -872,16 +1067,8 @@ async function compressVideo(file){
     "-preset",
     "veryfast",
 
-    "-b:v",
-    String(videoBitrate),
-
-    "-maxrate",
-    String(videoBitrate),
-
-    "-bufsize",
-    String(
-      videoBitrate * 2
-    ),
+    "-crf",
+    "28",
 
     "-c:a",
     "aac",
@@ -899,7 +1086,6 @@ async function compressVideo(file){
 
   ]);
 
-
   const data =
     await engine.readFile(
       outputName
@@ -913,8 +1099,7 @@ async function compressVideo(file){
     outputName
   );
 
-
-  const compressedBlob =
+  let blob =
     new Blob(
       [data.buffer],
       {
@@ -923,40 +1108,35 @@ async function compressVideo(file){
     );
 
 
-  /*
-     Eğer ilk sıkıştırma yine 50 MB üstündeyse
-     daha agresif ikinci bir sıkıştırma yapıyoruz.
-  */
+  /* İkinci küçültme */
 
   if(
-    compressedBlob.size >
-    SAFE_VIDEO_SIZE
+    blob.size >
+    SAFE_FILE_SIZE
   ){
 
     status.textContent =
       "🎬 Video biraz daha küçültülüyor...";
 
-    const secondInput =
-      "second_" +
-      Date.now() +
+    const input2 =
+      "input2-" +
+      stamp +
       ".mp4";
 
-    const secondOutput =
-      "second_compressed_" +
-      Date.now() +
+    const output2 =
+      "output2-" +
+      stamp +
       ".mp4";
 
     await engine.writeFile(
-      secondInput,
-      await fetchFile(
-        compressedBlob
-      )
+      input2,
+      await fetchFile(blob)
     );
 
     await engine.exec([
 
       "-i",
-      secondInput,
+      input2,
 
       "-vf",
       "scale='min(960,iw)':-2",
@@ -967,8 +1147,8 @@ async function compressVideo(file){
       "-preset",
       "veryfast",
 
-      "-b:v",
-      "650k",
+      "-crf",
+      "32",
 
       "-c:a",
       "aac",
@@ -982,71 +1162,47 @@ async function compressVideo(file){
       "-pix_fmt",
       "yuv420p",
 
-      secondOutput
+      output2
 
     ]);
 
-    const secondData =
+    const data2 =
       await engine.readFile(
-        secondOutput
+        output2
       );
 
     await engine.deleteFile(
-      secondInput
+      input2
     );
 
     await engine.deleteFile(
-      secondOutput
+      output2
     );
 
-    const secondBlob =
+    blob =
       new Blob(
-        [secondData.buffer],
+        [data2.buffer],
         {
           type:"video/mp4"
         }
       );
 
-    if(
-      secondBlob.size >
-      MAX_FILE_SIZE
-    ){
-
-      throw new Error(
-        "Bu video çok uzun veya yüksek kalitede. Lütfen daha kısa bir video seçin."
-      );
-
-    }
-
-    return new File(
-      [secondBlob],
-      file.name.replace(
-        /\.[^/.]+$/,
-        ""
-      ) + ".mp4",
-      {
-        type:"video/mp4",
-        lastModified:Date.now()
-      }
-    );
-
   }
 
 
   if(
-    compressedBlob.size >
+    blob.size >
     MAX_FILE_SIZE
   ){
 
     throw new Error(
-      "Video 50 MB altına indirilemedi. Lütfen daha kısa bir video seçin."
+      "Bu video 50 MB altına indirilemedi. Lütfen daha kısa bir video seçin."
     );
 
   }
 
-
   return new File(
-    [compressedBlob],
+    [blob],
     file.name.replace(
       /\.[^/.]+$/,
       ""
@@ -1075,51 +1231,29 @@ async function prepareFiles(
     const photo of photos
   ){
 
-    if(
-      photo.size >
-      MAX_FILE_SIZE
-    ){
-
-      throw new Error(
-        "Fotoğraf 50 MB'dan büyük: " +
-        photo.name
+    const compressed =
+      await compressImage(
+        photo
       );
 
-    }
-
     prepared.push(
-      photo
+      compressed
     );
 
   }
-
 
   for(
     const video of videos
   ){
 
-    if(
-      video.size >
-      SAFE_VIDEO_SIZE
-    ){
-
-      const compressed =
-        await compressVideo(
-          video
-        );
-
-      prepared.push(
-        compressed
-      );
-
-    }
-    else{
-
-      prepared.push(
+    const compressed =
+      await compressVideo(
         video
       );
 
-    }
+    prepared.push(
+      compressed
+    );
 
   }
 
@@ -1129,7 +1263,7 @@ async function prepareFiles(
 
 
 /* =====================================================
-   DOSYALARI YÜKLE
+   YÜKLEME
 ===================================================== */
 
 uploadButton.addEventListener(
@@ -1184,14 +1318,21 @@ uploadButton.addEventListener(
     uploadButton.disabled =
       true;
 
-    uploadButton.textContent =
-      "Hazırlanıyor...";
+    successBox.style.display =
+      "none";
 
-    status.textContent =
-      "Dosyalar hazırlanıyor...";
+    progress.style.display =
+      "block";
+
+    progressBar.style.width =
+      "0%";
 
 
     try{
+
+      status.textContent =
+        "Dosyalar hazırlanıyor...";
+
 
       const files =
         await prepareFiles(
@@ -1206,10 +1347,6 @@ uploadButton.addEventListener(
       for(
         const file of files
       ){
-
-        uploadButton.textContent =
-          "Dosyalar yükleniyor...";
-
 
         const extension =
           file.name
@@ -1233,13 +1370,15 @@ uploadButton.addEventListener(
 
 
         status.textContent =
+          `${uploadedCount + 1} / ${files.length} dosya yükleniyor...`;
+
+
+        progressBar.style.width =
           (
-            uploadedCount +
-            1
-          ) +
-          " / " +
-          files.length +
-          " dosya yükleniyor...";
+            uploadedCount /
+            files.length *
+            100
+          ) + "%";
 
 
         const {
@@ -1266,20 +1405,10 @@ uploadButton.addEventListener(
         }
 
 
-        const {
-          data:publicUrlData
-        } =
-          supabaseClient
-            .storage
-            .from("event-files")
-            .getPublicUrl(
-              filePath
-            );
-
-
-        const fileUrl =
-          publicUrlData.publicUrl;
-
+        /*
+          PRIVATE BUCKET:
+          public URL oluşturmuyoruz.
+        */
 
         const {
           error:databaseError
@@ -1295,7 +1424,7 @@ uploadButton.addEventListener(
                 filePath,
 
               file_url:
-                fileUrl,
+                null,
 
               uploader_name:
                 name,
@@ -1315,13 +1444,21 @@ uploadButton.addEventListener(
 
         uploadedCount++;
 
+        progressBar.style.width =
+          (
+            uploadedCount /
+            files.length *
+            100
+          ) + "%";
+
       }
 
 
       status.textContent =
-        "✨ " +
-        uploadedCount +
-        " dosyanız başarıyla paylaşıldı.";
+        "✨ Anınız başarıyla paylaşıldı.";
+
+      successBox.style.display =
+        "block";
 
 
       photoInput.value =
@@ -1336,16 +1473,8 @@ uploadButton.addEventListener(
       noteInput.value =
         "";
 
-
       fileName.textContent =
         "Henüz fotoğraf veya video seçilmedi.";
-
-
-      uploadButton.textContent =
-        "✨ Fotoğraf ve Videoları Paylaş";
-
-
-      await loadGallery();
 
 
     }
@@ -1356,29 +1485,12 @@ uploadButton.addEventListener(
         error
       );
 
-
-      let message =
-        "Bir sorun oluştu. Lütfen tekrar deneyin.";
-
-
-      if(
-        error &&
-        error.message
-      ){
-
-        message =
-          error.message;
-
-      }
-
-
       status.textContent =
         "❌ " +
-        message;
-
-
-      uploadButton.textContent =
-        "✨ Fotoğraf ve Videoları Paylaş";
+        (
+          error?.message ||
+          "Bir sorun oluştu. Lütfen tekrar deneyin."
+        );
 
     }
 
@@ -1391,20 +1503,209 @@ uploadButton.addEventListener(
 
 
 /* =====================================================
-   GALERİ
+   ÇİFT GİRİŞ PANELİ
 ===================================================== */
 
-galleryButton.addEventListener(
+adminLink.addEventListener(
   "click",
-  loadGallery
+  function(){
+
+    adminPanel.style.display =
+      adminPanel.style.display === "block"
+        ? "none"
+        : "block";
+
+  }
 );
 
 
-async function loadGallery(){
+/* =====================================================
+   ÇİFT GİRİŞİ
+===================================================== */
 
-  gallery.style.display =
+adminLoginButton.addEventListener(
+  "click",
+  async function(){
+
+    const email =
+      adminEmail.value.trim();
+
+    const password =
+      adminPassword.value;
+
+
+    if(
+      !email ||
+      !password
+    ){
+
+      adminStatus.textContent =
+        "E-posta ve şifreyi girin.";
+
+      return;
+
+    }
+
+
+    adminLoginButton.disabled =
+      true;
+
+    adminStatus.textContent =
+      "Giriş yapılıyor...";
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .auth
+        .signInWithPassword({
+
+          email,
+          password
+
+        });
+
+
+    if(error){
+
+      console.error(
+        error
+      );
+
+      adminStatus.textContent =
+        "❌ E-posta veya şifre hatalı.";
+
+      adminLoginButton.disabled =
+        false;
+
+      return;
+
+    }
+
+
+    adminStatus.textContent =
+      "✨ Giriş başarılı.";
+
+    adminLoginButton.style.display =
+      "none";
+
+    logoutButton.style.display =
+      "block";
+
+    adminEmail.style.display =
+      "none";
+
+    adminPassword.style.display =
+      "none";
+
+
+    await loadAdminGallery();
+
+    adminLoginButton.disabled =
+      false;
+
+  }
+);
+
+
+/* =====================================================
+   ÇIKIŞ
+===================================================== */
+
+logoutButton.addEventListener(
+  "click",
+  async function(){
+
+    await supabaseClient
+      .auth
+      .signOut();
+
+    adminGallery.style.display =
+      "none";
+
+    adminStatus.textContent =
+      "Çıkış yapıldı.";
+
+    adminLoginButton.style.display =
+      "block";
+
+    logoutButton.style.display =
+      "none";
+
+    adminEmail.style.display =
+      "block";
+
+    adminPassword.style.display =
+      "block";
+
+    adminPassword.value =
+      "";
+
+  }
+);
+
+
+/* =====================================================
+   OTURUM KONTROLÜ
+===================================================== */
+
+supabaseClient
+  .auth
+  .getSession()
+  .then(
+    async function(result){
+
+      if(
+        result?.data?.session
+      ){
+
+        adminLoginButton.style.display =
+          "none";
+
+        logoutButton.style.display =
+          "block";
+
+        adminEmail.style.display =
+          "none";
+
+        adminPassword.style.display =
+          "none";
+
+        await loadAdminGallery();
+
+      }
+
+    }
+  );
+
+
+/* =====================================================
+   ÇİFT GALERİSİ
+===================================================== */
+
+async function loadAdminGallery(){
+
+  const {
+    data:sessionData
+  } =
+    await supabaseClient
+      .auth
+      .getSession();
+
+
+  if(
+    !sessionData?.session
+  ){
+
+    return;
+
+  }
+
+
+  adminGallery.style.display =
     "block";
-
 
   galleryContent.innerHTML =
     '<div class="empty">Anılar yükleniyor...</div>';
@@ -1416,7 +1717,9 @@ async function loadGallery(){
   } =
     await supabaseClient
       .from("event_photos")
-      .select("*")
+      .select(
+        "id,event_code,file_path,uploader_name,note,created_at"
+      )
       .eq(
         "event_code",
         EVENT_CODE
@@ -1432,12 +1735,11 @@ async function loadGallery(){
   if(error){
 
     console.error(
-      "Galeri hatası:",
       error
     );
 
     galleryContent.innerHTML =
-      '<div class="empty">Anılar yüklenemedi.</div>';
+      '<div class="empty">Galeriyi açmak için veritabanı erişim izni gerekiyor.</div>';
 
     return;
 
@@ -1461,134 +1763,275 @@ async function loadGallery(){
     "";
 
 
-  data.forEach(
-    function(item){
+  for(
+    const item of data
+  ){
 
-      const card =
+    const {
+      data:signedData,
+      error:signedError
+    } =
+      await supabaseClient
+        .storage
+        .from("event-files")
+        .createSignedUrl(
+          item.file_path,
+          3600
+        );
+
+
+    if(signedError){
+
+      console.error(
+        signedError
+      );
+
+      continue;
+
+    }
+
+
+    const signedUrl =
+      signedData?.signedUrl;
+
+
+    if(!signedUrl){
+
+      continue;
+
+    }
+
+
+    const card =
+      document.createElement(
+        "div"
+      );
+
+    card.className =
+      "photo-card";
+
+
+    const isVideo =
+      /\.(mp4|mov|webm|avi|m4v)$/i
+        .test(
+          item.file_path
+        );
+
+
+    let media;
+
+
+    if(isVideo){
+
+      media =
+        document.createElement(
+          "video"
+        );
+
+      media.src =
+        signedUrl;
+
+      media.controls =
+        true;
+
+      media.playsInline =
+        true;
+
+      media.preload =
+        "metadata";
+
+    }
+    else{
+
+      media =
+        document.createElement(
+          "img"
+        );
+
+      media.src =
+        signedUrl;
+
+      media.alt =
+        "Atelier Memoria";
+
+      media.loading =
+        "lazy";
+
+    }
+
+
+    const info =
+      document.createElement(
+        "div"
+      );
+
+    info.className =
+      "photo-info";
+
+
+    const person =
+      document.createElement(
+        "div"
+      );
+
+    person.className =
+      "photo-name";
+
+    person.textContent =
+      "♡ " +
+      (
+        item.uploader_name ||
+        "Anonim"
+      );
+
+
+    info.appendChild(
+      person
+    );
+
+
+    if(item.note){
+
+      const note =
         document.createElement(
           "div"
         );
 
-      card.className =
-        "photo-card";
+      note.className =
+        "photo-note";
 
-
-      const isVideo =
-        item.file_path
-          .toLowerCase()
-          .match(
-            /\.(mp4|mov|webm|avi|m4v)$/i
-          );
-
-
-      let media;
-
-
-      if(isVideo){
-
-        media =
-          document.createElement(
-            "video"
-          );
-
-        media.src =
-          item.file_url;
-
-        media.controls =
-          true;
-
-        media.playsInline =
-          true;
-
-        media.preload =
-          "metadata";
-
-      }
-      else{
-
-        media =
-          document.createElement(
-            "img"
-          );
-
-        media.src =
-          item.file_url;
-
-        media.alt =
-          "Atelier Memoria";
-
-        media.loading =
-          "lazy";
-
-      }
-
-
-      const info =
-        document.createElement(
-          "div"
-        );
-
-      info.className =
-        "photo-info";
-
-
-      const person =
-        document.createElement(
-          "div"
-        );
-
-      person.className =
-        "photo-name";
-
-
-      person.textContent =
-        "♡ " +
-        (
-          item.uploader_name ||
-          "Anonim"
-        );
-
+      note.textContent =
+        item.note;
 
       info.appendChild(
-        person
-      );
-
-
-      if(item.note){
-
-        const note =
-          document.createElement(
-            "div"
-          );
-
-        note.className =
-          "photo-note";
-
-        note.textContent =
-          item.note;
-
-        info.appendChild(
-          note
-        );
-
-      }
-
-
-      card.appendChild(
-        media
-      );
-
-      card.appendChild(
-        info
-      );
-
-
-      galleryContent.appendChild(
-        card
+        note
       );
 
     }
-  );
+
+
+    const download =
+      document.createElement(
+        "button"
+      );
+
+    download.className =
+      "download-button";
+
+    download.textContent =
+      isVideo
+        ? "⬇️ Videoyu İndir"
+        : "⬇️ Fotoğrafı İndir";
+
+
+    download.addEventListener(
+      "click",
+      async function(){
+
+        download.disabled =
+          true;
+
+        download.textContent =
+          "Hazırlanıyor...";
+
+
+        const {
+          data:downloadData,
+          error:downloadError
+        } =
+          await supabaseClient
+            .storage
+            .from("event-files")
+            .download(
+              item.file_path
+            );
+
+
+        if(downloadError){
+
+          console.error(
+            downloadError
+          );
+
+          /*
+             Signed URL ile indirmeyi dene.
+          */
+
+          window.open(
+            signedUrl,
+            "_blank"
+          );
+
+        }
+        else{
+
+          const blobUrl =
+            URL.createObjectURL(
+              downloadData
+            );
+
+          const a =
+            document.createElement(
+              "a"
+            );
+
+          a.href =
+            blobUrl;
+
+          a.download =
+            item.file_path
+              .split("/")
+              .pop();
+
+          document.body.appendChild(
+            a
+          );
+
+          a.click();
+
+          a.remove();
+
+          setTimeout(
+            () =>
+              URL.revokeObjectURL(
+                blobUrl
+              ),
+            2000
+          );
+
+        }
+
+
+        download.disabled =
+          false;
+
+        download.textContent =
+          isVideo
+            ? "⬇️ Videoyu İndir"
+            : "⬇️ Fotoğrafı İndir";
+
+      }
+    );
+
+
+    info.appendChild(
+      download
+    );
+
+
+    card.appendChild(
+      media
+    );
+
+    card.appendChild(
+      info
+    );
+
+    galleryContent.appendChild(
+      card
+    );
+
+  }
 
 }
 
