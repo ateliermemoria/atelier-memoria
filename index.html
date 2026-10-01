@@ -70,14 +70,22 @@
     }
 
     .upload-title {
-      font-size: 17px;
+      font-size: 18px;
       margin-bottom: 7px;
     }
 
     .upload-text {
       font-size: 13px;
+      line-height: 1.6;
       color: #8a7d76;
       margin-bottom: 22px;
+    }
+
+    .couple-name {
+      font-family: Georgia, serif;
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: #332b28;
     }
 
     .form-group {
@@ -136,7 +144,7 @@
     }
 
     .button:disabled {
-      opacity: 0.6;
+      opacity: 0.55;
       cursor: not-allowed;
     }
 
@@ -157,9 +165,9 @@
     .file-name {
       font-size: 12px;
       color: #8a7d76;
-      margin-top: 10px;
+      margin-top: 12px;
       word-break: break-word;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .status {
@@ -193,13 +201,13 @@
     .photo-card video {
       width: 100%;
       display: block;
-      max-height: 500px;
+      max-height: 550px;
       object-fit: cover;
       background: #000;
     }
 
     .photo-card video {
-      max-height: 600px;
+      object-fit: contain;
     }
 
     .photo-info {
@@ -230,6 +238,14 @@
       color: #a0958e;
       letter-spacing: 1px;
     }
+
+    .selected-list {
+      text-align: left;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #756963;
+      line-height: 1.7;
+    }
   </style>
 </head>
 
@@ -239,9 +255,12 @@
 
   <div class="logo">Atelier Memoria</div>
 
-  <h1>Anılar burada başlar.</h1>
+  <!-- ÇİFT İSMİ BURADA GÖRÜNECEK -->
+  <h1 id="eventTitle">
+    Anılar burada başlar.
+  </h1>
 
-  <div class="subtitle">
+  <div class="subtitle" id="eventSubtitle">
     Bu özel güne ait fotoğraf ve videolarınızı<br>
     bizimle paylaşın ve anılara ortak olun.
   </div>
@@ -252,17 +271,28 @@
 
       <div class="camera">📸</div>
 
+      <div
+        class="couple-name"
+        id="coupleName"
+      ></div>
+
       <div class="upload-title">
-        Anınızı paylaşın
+        Bir anı bırak 💌
       </div>
 
       <div class="upload-text">
-        Fotoğrafınızı veya videonuzu seçin,<br>
+        Fotoğraf veya videolarınızı seçin,<br>
         adınızı ve dilerseniz bir not bırakın.
       </div>
 
+
+      <!-- AD -->
+
       <div class="form-group">
-        <label for="name">Adınız</label>
+
+        <label for="name">
+          Adınız
+        </label>
 
         <input
           type="text"
@@ -270,16 +300,24 @@
           placeholder="Örn. Büşra"
           maxlength="60"
         >
+
       </div>
 
+
+      <!-- NOT -->
+
       <div class="form-group">
-        <label for="note">Notunuz</label>
+
+        <label for="note">
+          Notunuz
+        </label>
 
         <textarea
           id="note"
           placeholder="Bu güzel güne küçük bir not bırakın..."
           maxlength="500"
         ></textarea>
+
       </div>
 
 
@@ -296,17 +334,18 @@
         type="file"
         id="photo"
         accept="image/*"
+        multiple
       >
 
 
-      <!-- FOTOĞRAF PAYLAŞ -->
+      <!-- FOTOĞRAF YÜKLE -->
 
       <button
         id="photoUploadButton"
         class="button upload-button"
         type="button"
       >
-        📷 Fotoğrafı Paylaş
+        📷 Fotoğrafları Paylaş
       </button>
 
 
@@ -323,19 +362,22 @@
         type="file"
         id="video"
         accept="video/*"
+        multiple
       >
 
 
-      <!-- VİDEO PAYLAŞ -->
+      <!-- VİDEO YÜKLE -->
 
       <button
         id="videoUploadButton"
         class="button upload-button video-button"
         type="button"
       >
-        🎥 Videoyu Paylaş
+        🎥 Videoları Paylaş
       </button>
 
+
+      <!-- SEÇİLEN DOSYALAR -->
 
       <div
         id="fileName"
@@ -344,6 +386,13 @@
         Henüz dosya seçilmedi.
       </div>
 
+      <div
+        id="selectedList"
+        class="selected-list"
+      ></div>
+
+
+      <!-- DURUM -->
 
       <div
         id="status"
@@ -353,12 +402,14 @@
     </div>
 
 
+    <!-- GALERİ -->
+
     <button
       id="galleryButton"
       class="button gallery-button"
       type="button"
     >
-      🖼️ Fotoğrafları ve Videoları Gör
+      🖼️ Anıları Gör
     </button>
 
   </div>
@@ -369,7 +420,9 @@
     class="gallery"
   >
 
-    <h2>Bu Günden Kalanlar</h2>
+    <h2 id="galleryTitle">
+      Bu Günden Kalanlar
+    </h2>
 
     <div id="galleryContent"></div>
 
@@ -385,523 +438,732 @@
 
 <script>
 
-  /* ==========================================
-     SUPABASE AYARLARI
-     ========================================== */
+/* =====================================================
+   SUPABASE
+   ===================================================== */
 
-  const SUPABASE_URL =
-    "https://hokwiohkbceiyffqwrbn.supabase.co";
+const SUPABASE_URL =
+  "https://hokwiohkbceiyffqwrbn.supabase.co";
 
-  const SUPABASE_ANON_KEY =
-    "sb_publishable_6BRruSgb5EKyMhP7CSOwzw_KrcaXOWq";
+const SUPABASE_ANON_KEY =
+  "sb_publishable_6BRruSgb5EKyMhP7CSOwzw_KrcaXOWq";
 
-  const supabaseClient =
-    supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
+const supabaseClient =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+/* =====================================================
+   ETKİNLİK KODLARI
+   ===================================================== */
+
+/*
+   BURAYA YENİ ÇİFTLER EKLEYEBİLİRSİN.
+
+   ÖRNEK:
+
+   ?event=busra-yasar
+
+   sonucunda:
+
+   Büşra & Yaşar Wedding
+   Büşra & Yaşar için bir anı bırak 💌
+
+*/
+
+const EVENTS = {
+
+  "busra-yasar": {
+    couple: "Büşra & Yaşar",
+    title: "Büşra & Yaşar Wedding"
+  },
+
+  "demo": {
+    couple: "Büşra & Yaşar",
+    title: "Büşra & Yaşar Wedding"
+  }
+
+};
+
+
+/* =====================================================
+   URL'DEN ETKİNLİK KODUNU AL
+   ===================================================== */
+
+const urlParams =
+  new URLSearchParams(
+    window.location.search
+  );
+
+const EVENT_CODE =
+  urlParams.get("event") || "demo";
+
+
+/* =====================================================
+   ETKİNLİK BİLGİSİ
+   ===================================================== */
+
+const EVENT =
+  EVENTS[EVENT_CODE] || EVENTS["demo"];
+
+
+/* =====================================================
+   SAYFADAKİ İSİMLERİ DEĞİŞTİR
+   ===================================================== */
+
+document.title =
+  EVENT.title + " • Atelier Memoria";
+
+
+document.getElementById(
+  "eventTitle"
+).textContent =
+  EVENT.title;
+
+
+document.getElementById(
+  "coupleName"
+).textContent =
+  EVENT.couple;
+
+
+document.getElementById(
+  "eventSubtitle"
+).innerHTML =
+  EVENT.couple +
+  " için bir anı bırakın 💌<br>" +
+  "Fotoğraf ve videolarınızı paylaşın.";
+
+
+document.getElementById(
+  "galleryTitle"
+).textContent =
+  EVENT.couple +
+  " • Anılar";
+
+
+/* =====================================================
+   ELEMENTLER
+   ===================================================== */
+
+const photoInput =
+  document.getElementById("photo");
+
+const videoInput =
+  document.getElementById("video");
+
+const fileName =
+  document.getElementById("fileName");
+
+const selectedList =
+  document.getElementById("selectedList");
+
+const nameInput =
+  document.getElementById("name");
+
+const noteInput =
+  document.getElementById("note");
+
+const photoUploadButton =
+  document.getElementById(
+    "photoUploadButton"
+  );
+
+const videoUploadButton =
+  document.getElementById(
+    "videoUploadButton"
+  );
+
+const galleryButton =
+  document.getElementById(
+    "galleryButton"
+  );
+
+const status =
+  document.getElementById("status");
+
+const gallery =
+  document.getElementById("gallery");
+
+const galleryContent =
+  document.getElementById(
+    "galleryContent"
+  );
+
+
+/* =====================================================
+   FOTOĞRAF SEÇİLDİ
+   ===================================================== */
+
+photoInput.addEventListener(
+  "change",
+  function() {
+
+    const files =
+      Array.from(this.files);
+
+    if (files.length === 0) {
+
+      fileName.textContent =
+        "Henüz fotoğraf seçilmedi.";
+
+      selectedList.innerHTML =
+        "";
+
+      return;
+
+    }
+
+
+    fileName.textContent =
+      files.length +
+      " fotoğraf seçildi.";
+
+
+    selectedList.innerHTML =
+      files
+        .map(
+          (file, index) =>
+            "📷 " +
+            (index + 1) +
+            ". " +
+            file.name
+        )
+        .join("<br>");
+
+    status.textContent =
+      "";
+
+  }
+);
+
+
+/* =====================================================
+   VİDEO SEÇİLDİ
+   ===================================================== */
+
+videoInput.addEventListener(
+  "change",
+  function() {
+
+    const files =
+      Array.from(this.files);
+
+    if (files.length === 0) {
+
+      fileName.textContent =
+        "Henüz video seçilmedi.";
+
+      selectedList.innerHTML =
+        "";
+
+      return;
+
+    }
+
+
+    fileName.textContent =
+      files.length +
+      " video seçildi.";
+
+
+    selectedList.innerHTML =
+      files
+        .map(
+          (file, index) =>
+            "🎥 " +
+            (index + 1) +
+            ". " +
+            file.name
+        )
+        .join("<br>");
+
+    status.textContent =
+      "";
+
+  }
+);
+
+
+/* =====================================================
+   TEK DOSYAYI YÜKLE
+   ===================================================== */
+
+async function uploadSingleFile(
+  file,
+  type,
+  index,
+  total
+) {
+
+  /* İSİM */
+
+  const name =
+    nameInput.value.trim();
+
+
+  /* NOT */
+
+  const note =
+    noteInput.value.trim();
+
+
+  /* DOSYA */
+
+  if (!file) {
+
+    throw new Error(
+      "Dosya seçilmedi."
+    );
+
+  }
+
+
+  /* DOSYA TÜRÜ */
+
+  if (
+    type === "photo" &&
+    !file.type.startsWith("image/")
+  ) {
+
+    throw new Error(
+      "Geçersiz fotoğraf dosyası."
+    );
+
+  }
+
+
+  if (
+    type === "video" &&
+    !file.type.startsWith("video/")
+  ) {
+
+    throw new Error(
+      "Geçersiz video dosyası."
+    );
+
+  }
+
+
+  /* BOYUT */
+
+  const maxSize =
+    type === "photo"
+      ? 10 * 1024 * 1024
+      : 100 * 1024 * 1024;
+
+
+  if (file.size > maxSize) {
+
+    throw new Error(
+      type === "photo"
+        ? file.name +
+          " 10 MB'dan büyük."
+        : file.name +
+          " 100 MB'dan büyük."
+    );
+
+  }
+
+
+  /* UZANTI */
+
+  const extension =
+    file.name.includes(".")
+      ? file.name
+          .split(".")
+          .pop()
+          .toLowerCase()
+      : "";
+
+
+  /* BENZERSİZ İSİM */
+
+  const generatedFileName =
+    Date.now() +
+    "-" +
+    crypto.randomUUID() +
+    (
+      extension
+        ? "." + extension
+        : ""
     );
 
 
-  /* ==========================================
-     ETKİNLİK KODU
-     ========================================== */
+  /* KLASÖR */
 
-  const urlParams =
-    new URLSearchParams(window.location.search);
+  const filePath =
+    EVENT_CODE +
+    "/" +
+    generatedFileName;
 
-  const EVENT_CODE =
-    urlParams.get("event") || "demo";
 
+  /* ================================================
+     STORAGE
+     ================================================ */
 
-  /* ==========================================
-     ELEMENTLER
-     ========================================== */
+  const {
+    error: uploadError
+  } =
+    await supabaseClient
+      .storage
+      .from("event-files")
+      .upload(
+        filePath,
+        file,
+        {
+          contentType:
+            file.type,
 
-  const photoInput =
-    document.getElementById("photo");
+          upsert:
+            false
+        }
+      );
 
-  const videoInput =
-    document.getElementById("video");
 
-  const fileName =
-    document.getElementById("fileName");
+  if (uploadError) {
 
-  const nameInput =
-    document.getElementById("name");
+    throw uploadError;
 
-  const noteInput =
-    document.getElementById("note");
+  }
 
-  const photoUploadButton =
-    document.getElementById("photoUploadButton");
 
-  const videoUploadButton =
-    document.getElementById("videoUploadButton");
+  /* ================================================
+     PUBLIC URL
+     ================================================ */
 
-  const galleryButton =
-    document.getElementById("galleryButton");
+  const {
+    data: publicUrlData
+  } =
+    supabaseClient
+      .storage
+      .from("event-files")
+      .getPublicUrl(
+        filePath
+      );
 
-  const status =
-    document.getElementById("status");
 
-  const gallery =
-    document.getElementById("gallery");
+  const fileUrl =
+    publicUrlData.publicUrl;
 
-  const galleryContent =
-    document.getElementById("galleryContent");
 
+  /* ================================================
+     VERİTABANI
+     ================================================ */
 
-  /* ==========================================
-     FOTOĞRAF SEÇİLDİ
-     ========================================== */
+  const {
+    error: databaseError
+  } =
+    await supabaseClient
+      .from("event_photos")
+      .insert({
 
-  photoInput.addEventListener(
-    "change",
-    function() {
+        event_code:
+          EVENT_CODE,
 
-      if (this.files.length > 0) {
+        file_path:
+          filePath,
 
-        fileName.textContent =
-          "📷 Seçilen fotoğraf: " +
-          this.files[0].name;
+        file_url:
+          fileUrl,
 
-        status.textContent = "";
+        uploader_name:
+          name,
 
-      } else {
+        note:
+          note || null
 
-        fileName.textContent =
-          "Henüz dosya seçilmedi.";
+      });
 
-      }
 
-    }
-  );
+  if (databaseError) {
 
+    throw databaseError;
 
-  /* ==========================================
-     VİDEO SEÇİLDİ
-     ========================================== */
+  }
 
-  videoInput.addEventListener(
-    "change",
-    function() {
 
-      if (this.files.length > 0) {
+  return true;
 
-        fileName.textContent =
-          "🎥 Seçilen video: " +
-          this.files[0].name;
+}
 
-        status.textContent = "";
 
-      } else {
+/* =====================================================
+   ÇOKLU DOSYA YÜKLEME
+   ===================================================== */
 
-        fileName.textContent =
-          "Henüz dosya seçilmedi.";
+async function uploadMultipleFiles(
+  files,
+  type
+) {
 
-      }
+  const fileArray =
+    Array.from(files);
 
-    }
-  );
 
+  if (
+    fileArray.length === 0
+  ) {
 
-  /* ==========================================
-     ORTAK YÜKLEME FONKSİYONU
-     ========================================== */
-
-  async function uploadFile(file, type) {
-
-    const name =
-      nameInput.value.trim();
-
-    const note =
-      noteInput.value.trim();
-
-
-    /* DOSYA KONTROLÜ */
-
-    if (!file) {
-
-      status.textContent =
-        type === "photo"
-          ? "Lütfen önce bir fotoğraf seçin."
-          : "Lütfen önce bir video seçin.";
-
-      return;
-
-    }
-
-
-    /* İSİM KONTROLÜ */
-
-    if (!name) {
-
-      status.textContent =
-        "Lütfen adınızı yazın.";
-
-      nameInput.focus();
-
-      return;
-
-    }
-
-
-    /* DOSYA TÜRÜ KONTROLÜ */
-
-    if (type === "photo") {
-
-      if (!file.type.startsWith("image/")) {
-
-        status.textContent =
-          "Lütfen geçerli bir fotoğraf seçin.";
-
-        return;
-
-      }
-
-    }
-
-
-    if (type === "video") {
-
-      if (!file.type.startsWith("video/")) {
-
-        status.textContent =
-          "Lütfen geçerli bir video seçin.";
-
-        return;
-
-      }
-
-    }
-
-
-    /* DOSYA BOYUTU */
-
-    const maxSize =
+    status.textContent =
       type === "photo"
-        ? 10 * 1024 * 1024
-        : 100 * 1024 * 1024;
+        ? "Lütfen önce fotoğraf seçin."
+        : "Lütfen önce video seçin.";
+
+    return;
+
+  }
 
 
-    if (file.size > maxSize) {
+  /* İSİM ZORUNLU */
+
+  if (
+    !nameInput.value.trim()
+  ) {
+
+    status.textContent =
+      "Lütfen adınızı yazın.";
+
+    nameInput.focus();
+
+    return;
+
+  }
+
+
+  /* BUTONLARI KİLİTLE */
+
+  photoUploadButton.disabled =
+    true;
+
+  videoUploadButton.disabled =
+    true;
+
+
+  let successCount = 0;
+
+
+  try {
+
+    for (
+      let i = 0;
+      i < fileArray.length;
+      i++
+    ) {
 
       status.textContent =
-        type === "photo"
-          ? "Fotoğraf 10 MB'dan küçük olmalı."
-          : "Video 100 MB'dan küçük olmalı.";
-
-      return;
-
-    }
-
-
-    /* BUTONLARI KİLİTLE */
-
-    photoUploadButton.disabled = true;
-    videoUploadButton.disabled = true;
+        (
+          type === "photo"
+            ? "📷 Fotoğraflar"
+            : "🎥 Videolar"
+        ) +
+        " yükleniyor... " +
+        (i + 1) +
+        " / " +
+        fileArray.length;
 
 
-    if (type === "photo") {
+      await uploadSingleFile(
+        fileArray[i],
+        type,
+        i,
+        fileArray.length
+      );
 
-      photoUploadButton.textContent =
-        "📷 Fotoğraf yükleniyor...";
 
-    } else {
-
-      videoUploadButton.textContent =
-        "🎥 Video yükleniyor...";
+      successCount++;
 
     }
 
 
     status.textContent =
-      "Dosyanız yükleniyor...";
-
-
-    try {
-
-      /* DOSYA UZANTISI */
-
-      const extension =
-        file.name.includes(".")
-          ? file.name.split(".").pop().toLowerCase()
-          : "";
-
-
-      /* BENZERSİZ DOSYA ADI */
-
-      const generatedFileName =
-        Date.now() +
-        "-" +
-        crypto.randomUUID() +
-        (extension ? "." + extension : "");
-
-
-      /* EVENT KLASÖRÜ */
-
-      const filePath =
-        EVENT_CODE +
-        "/" +
-        generatedFileName;
-
-
-      /* ==========================================
-         SUPABASE STORAGE'A YÜKLE
-         ========================================== */
-
-      const {
-        error: uploadError
-      } =
-        await supabaseClient
-          .storage
-          .from("event-files")
-          .upload(
-            filePath,
-            file,
-            {
-              contentType: file.type,
-              upsert: false
-            }
-          );
-
-
-      if (uploadError) {
-
-        throw uploadError;
-
-      }
-
-
-      /* ==========================================
-         PUBLIC URL
-         ========================================== */
-
-      const {
-        data: publicUrlData
-      } =
-        supabaseClient
-          .storage
-          .from("event-files")
-          .getPublicUrl(filePath);
-
-
-      const fileUrl =
-        publicUrlData.publicUrl;
-
-
-      /* ==========================================
-         DATABASE'E KAYDET
-         ========================================== */
-
-      const {
-        error: databaseError
-      } =
-        await supabaseClient
-          .from("event_photos")
-          .insert({
-
-            event_code:
-              EVENT_CODE,
-
-            file_path:
-              filePath,
-
-            file_url:
-              fileUrl,
-
-            uploader_name:
-              name,
-
-            note:
-              note || null
-
-          });
-
-
-      if (databaseError) {
-
-        throw databaseError;
-
-      }
-
-
-      /* ==========================================
-         BAŞARILI
-         ========================================== */
-
-      status.textContent =
+      "✨ " +
+      successCount +
+      " " +
+      (
         type === "photo"
-          ? "✨ Fotoğrafınız başarıyla paylaşıldı."
-          : "✨ Videonuz başarıyla paylaşıldı.";
+          ? "fotoğraf"
+          : "video"
+      ) +
+      " başarıyla paylaşıldı.";
 
 
-      /* FORMU TEMİZLE */
+    /* SEÇİMLERİ TEMİZLE */
 
-      photoInput.value = "";
-      videoInput.value = "";
+    if (type === "photo") {
 
-      nameInput.value = "";
-      noteInput.value = "";
+      photoInput.value =
+        "";
 
-      fileName.textContent =
-        "Henüz dosya seçilmedi.";
+    } else {
 
-
-      /* GALERİYİ YENİLE */
-
-      await loadGallery();
-
-
-    } catch (error) {
-
-      console.error(
-        "Yükleme hatası:",
-        error
-      );
-
-      status.textContent =
-        "Bir sorun oluştu. Lütfen tekrar deneyin.";
+      videoInput.value =
+        "";
 
     }
 
 
-    /* BUTONLARI AÇ */
+    fileName.textContent =
+      "Henüz dosya seçilmedi.";
 
-    photoUploadButton.disabled = false;
-    videoUploadButton.disabled = false;
+    selectedList.innerHTML =
+      "";
 
 
-    photoUploadButton.textContent =
-      "📷 Fotoğrafı Paylaş";
+    /* GALERİ */
 
-    videoUploadButton.textContent =
-      "🎥 Videoyu Paylaş";
+    await loadGallery();
+
+
+  } catch (error) {
+
+    console.error(
+      "Yükleme hatası:",
+      error
+    );
+
+
+    status.textContent =
+      "Bir dosya yüklenirken sorun oluştu: " +
+      error.message;
 
   }
 
 
-  /* ==========================================
-     FOTOĞRAF PAYLAŞ BUTONU
-     ========================================== */
+  photoUploadButton.disabled =
+    false;
 
-  photoUploadButton.addEventListener(
-    "click",
-    async function() {
+  videoUploadButton.disabled =
+    false;
 
-      const file =
-        photoInput.files[0];
+}
 
-      await uploadFile(
-        file,
-        "photo"
+
+/* =====================================================
+   FOTOĞRAFLARI PAYLAŞ
+   ===================================================== */
+
+photoUploadButton.addEventListener(
+  "click",
+  async function() {
+
+    await uploadMultipleFiles(
+      photoInput.files,
+      "photo"
+    );
+
+  }
+);
+
+
+/* =====================================================
+   VİDEOLARI PAYLAŞ
+   ===================================================== */
+
+videoUploadButton.addEventListener(
+  "click",
+  async function() {
+
+    await uploadMultipleFiles(
+      videoInput.files,
+      "video"
+    );
+
+  }
+);
+
+
+/* =====================================================
+   GALERİ BUTONU
+   ===================================================== */
+
+galleryButton.addEventListener(
+  "click",
+  loadGallery
+);
+
+
+/* =====================================================
+   GALERİYİ YÜKLE
+   ===================================================== */
+
+async function loadGallery() {
+
+  gallery.style.display =
+    "block";
+
+
+  galleryContent.innerHTML =
+    '<div class="empty">Anılar yükleniyor...</div>';
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("event_photos")
+      .select("*")
+      .eq(
+        "event_code",
+        EVENT_CODE
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
       );
 
-    }
-  );
 
+  if (error) {
 
-  /* ==========================================
-     VİDEO PAYLAŞ BUTONU
-     ========================================== */
-
-  videoUploadButton.addEventListener(
-    "click",
-    async function() {
-
-      const file =
-        videoInput.files[0];
-
-      await uploadFile(
-        file,
-        "video"
-      );
-
-    }
-  );
-
-
-  /* ==========================================
-     GALERİ
-     ========================================== */
-
-  galleryButton.addEventListener(
-    "click",
-    loadGallery
-  );
-
-
-  async function loadGallery() {
-
-    gallery.style.display =
-      "block";
-
+    console.error(error);
 
     galleryContent.innerHTML =
-      '<div class="empty">Anılar yükleniyor...</div>';
+      '<div class="empty">Anılar yüklenemedi.</div>';
+
+    return;
+
+  }
 
 
-    const {
-      data,
-      error
-    } =
-      await supabaseClient
-        .from("event_photos")
-        .select("*")
-        .eq(
-          "event_code",
-          EVENT_CODE
-        )
-        .order(
-          "created_at",
-          {
-            ascending: false
-          }
-        );
-
-
-    if (error) {
-
-      console.error(error);
-
-      galleryContent.innerHTML =
-        '<div class="empty">Anılar yüklenemedi.</div>';
-
-      return;
-
-    }
-
-
-    if (!data || data.length === 0) {
-
-      galleryContent.innerHTML =
-        '<div class="empty">Henüz fotoğraf veya video paylaşılmamış.</div>';
-
-      return;
-
-    }
-
+  if (
+    !data ||
+    data.length === 0
+  ) {
 
     galleryContent.innerHTML =
-      "";
+      '<div class="empty">Henüz anı paylaşılmamış.</div>';
+
+    return;
+
+  }
 
 
-    data.forEach(item => {
+  galleryContent.innerHTML =
+    "";
+
+
+  data.forEach(
+    item => {
 
       const card =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       card.className =
         "photo-card";
 
 
-      /* ==========================================
-         DOSYA TÜRÜNÜ UZANTIDAN ANLA
-         ========================================== */
-
       const filePath =
-        (item.file_path || "")
-          .toLowerCase();
+        (
+          item.file_path ||
+          ""
+        ).toLowerCase();
 
 
       const isVideo =
@@ -913,14 +1175,14 @@
         filePath.endsWith(".mkv");
 
 
-      /* ==========================================
-         MEDYA
-         ========================================== */
+      /* MEDYA */
 
       if (isVideo) {
 
         const video =
-          document.createElement("video");
+          document.createElement(
+            "video"
+          );
 
         video.src =
           item.file_url;
@@ -942,13 +1204,15 @@
       } else {
 
         const image =
-          document.createElement("img");
+          document.createElement(
+            "img"
+          );
 
         image.src =
           item.file_url;
 
         image.alt =
-          "Atelier Memoria";
+          EVENT.couple;
 
 
         card.appendChild(
@@ -958,33 +1222,42 @@
       }
 
 
-      /* ==========================================
-         BİLGİLER
-         ========================================== */
+      /* BİLGİ */
 
       const info =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       info.className =
         "photo-info";
 
 
       const person =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       person.className =
         "photo-name";
 
+
       person.textContent =
         "♡ " +
-        (item.uploader_name || "Anonim");
+        (
+          item.uploader_name ||
+          "Anonim"
+        );
 
 
       const note =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       note.className =
         "photo-note";
+
 
       note.textContent =
         item.note || "";
@@ -1013,9 +1286,10 @@
         card
       );
 
-    });
+    }
+  );
 
-  }
+}
 
 </script>
 
