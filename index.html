@@ -23,14 +23,29 @@
       font-family: Arial, sans-serif;
       color: #332b28;
       padding: 35px 18px;
-
       background-color: #f7f1e9;
 
       background-image:
-        radial-gradient(circle at 10% 15%, rgba(166, 137, 112, 0.12) 0 2px, transparent 3px),
-        radial-gradient(circle at 85% 20%, rgba(166, 137, 112, 0.10) 0 2px, transparent 3px),
-        radial-gradient(circle at 20% 80%, rgba(166, 137, 112, 0.10) 0 2px, transparent 3px),
-        radial-gradient(circle at 75% 75%, rgba(166, 137, 112, 0.10) 0 2px, transparent 3px);
+        radial-gradient(
+          circle at 10% 15%,
+          rgba(166, 137, 112, 0.12) 0 2px,
+          transparent 3px
+        ),
+        radial-gradient(
+          circle at 85% 20%,
+          rgba(166, 137, 112, 0.10) 0 2px,
+          transparent 3px
+        ),
+        radial-gradient(
+          circle at 20% 80%,
+          rgba(166, 137, 112, 0.10) 0 2px,
+          transparent 3px
+        ),
+        radial-gradient(
+          circle at 75% 75%,
+          rgba(166, 137, 112, 0.10) 0 2px,
+          transparent 3px
+        );
 
       background-size:
         85px 85px,
@@ -60,7 +75,6 @@
     .container {
       position: relative;
       z-index: 1;
-
       width: 100%;
       max-width: 540px;
       margin: auto;
@@ -79,28 +93,37 @@
       color: #a18b79;
       font-size: 18px;
       letter-spacing: 8px;
-      margin-bottom: 12px;
-    }
-
-    h1 {
-      font-family: Georgia, serif;
-      font-size: 38px;
-      font-weight: normal;
-      line-height: 1.2;
-      margin: 0 0 12px;
-      color: #332b28;
+      margin-bottom: 14px;
     }
 
     .couple {
       font-family: Georgia, serif;
-      font-size: 20px;
+      font-size: 38px;
+      font-weight: normal;
+      line-height: 1.2;
+      color: #332b28;
+      margin: 0 0 10px;
+    }
+
+    .wedding-text {
+      font-family: Georgia, serif;
+      font-size: 15px;
+      letter-spacing: 2px;
       color: #806b5c;
-      margin-bottom: 14px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .divider {
+      width: 55px;
+      height: 1px;
+      background: #cbbcaf;
+      margin: 18px auto;
     }
 
     .subtitle {
       font-size: 14px;
-      line-height: 1.7;
+      line-height: 1.8;
       color: #756963;
       margin-bottom: 28px;
     }
@@ -109,9 +132,11 @@
       background: rgba(255, 253, 250, 0.96);
       border-radius: 26px;
       padding: 27px 21px;
+
       box-shadow:
         0 18px 50px rgba(80, 60, 45, 0.10),
         0 2px 8px rgba(80, 60, 45, 0.04);
+
       border: 1px solid rgba(174, 150, 130, 0.16);
     }
 
@@ -304,13 +329,6 @@
       color: #a0958e;
       letter-spacing: 2px;
     }
-
-    .divider {
-      width: 55px;
-      height: 1px;
-      background: #cbbcaf;
-      margin: 18px auto;
-    }
   </style>
 </head>
 
@@ -326,20 +344,25 @@
     ✦ · ✦
   </div>
 
-  <h1>
-    Anılar burada başlar.
-  </h1>
+  <div
+    class="couple"
+    id="coupleName"
+  >
+    Büşra &amp; Yaşar
+  </div>
 
-  <div class="couple">
-    Büşra &amp; Yaşar Wedding
+  <div class="wedding-text">
+    Wedding Memories
   </div>
 
   <div class="divider"></div>
 
   <div class="subtitle">
-    Bu özel güne ait fotoğraf ve videolarınızı<br>
-    bizimle paylaşın, bu güzel anılara ortak olun.
+    Bu güzel güne bir anı bırakın.<br>
+    Fotoğrafınızı, videonuzu ve dilerseniz<br>
+    küçük bir notunuzu bizimle paylaşın.
   </div>
+
 
   <div class="card">
 
@@ -355,8 +378,8 @@
 
       <div class="upload-text">
         Birden fazla fotoğraf ve video seçebilirsiniz.
-        Dilerseniz adınızı ve güzel bir notunuzu da bırakabilirsiniz.
       </div>
+
 
       <div class="form-group">
 
@@ -373,6 +396,7 @@
 
       </div>
 
+
       <div class="form-group">
 
         <label for="note">
@@ -387,8 +411,6 @@
 
       </div>
 
-
-      <!-- FOTOĞRAF SEÇ -->
 
       <label
         for="photo"
@@ -405,8 +427,6 @@
       >
 
 
-      <!-- VİDEO SEÇ -->
-
       <label
         for="video"
         class="button video-button"
@@ -422,8 +442,6 @@
       >
 
 
-      <!-- SEÇİLEN DOSYALAR -->
-
       <div
         id="fileName"
         class="file-name"
@@ -431,8 +449,6 @@
         Henüz fotoğraf veya video seçilmedi.
       </div>
 
-
-      <!-- PAYLAŞ -->
 
       <button
         id="uploadButton"
@@ -450,8 +466,6 @@
 
     </div>
 
-
-    <!-- GALERİ -->
 
     <button
       id="galleryButton"
@@ -505,7 +519,7 @@
 
 
   /* =====================================================
-     ETKİNLİK KODU
+     EVENT CODE
   ===================================================== */
 
   const urlParams =
@@ -514,7 +528,41 @@
     );
 
   const EVENT_CODE =
-    urlParams.get("event") || "demo";
+    urlParams.get("event") || "busra-yasar-wedding";
+
+
+  /* =====================================================
+     ÇİFT İSİMLERİ
+  ===================================================== */
+
+  const coupleNames = {
+
+    "busra-yasar-wedding":
+      "Büşra & Yaşar",
+
+    "ayse-mehmet-wedding":
+      "Ayşe & Mehmet",
+
+    "demo":
+      "Büşra & Yaşar"
+
+  };
+
+
+  const coupleNameElement =
+    document.getElementById(
+      "coupleName"
+    );
+
+
+  if (
+    coupleNames[EVENT_CODE]
+  ) {
+
+    coupleNameElement.textContent =
+      coupleNames[EVENT_CODE];
+
+  }
 
 
   /* =====================================================
@@ -549,23 +597,31 @@
     document.getElementById("gallery");
 
   const galleryContent =
-    document.getElementById("galleryContent");
+    document.getElementById(
+      "galleryContent"
+    );
 
 
   /* =====================================================
-     SEÇİLEN DOSYALARI GÖSTER
+     SEÇİLEN DOSYALAR
   ===================================================== */
 
   function updateSelectedFiles() {
 
     const photos =
-      Array.from(photoInput.files || []);
+      Array.from(
+        photoInput.files || []
+      );
 
     const videos =
-      Array.from(videoInput.files || []);
+      Array.from(
+        videoInput.files || []
+      );
 
     const total =
-      photos.length + videos.length;
+      photos.length +
+      videos.length;
+
 
     if (total === 0) {
 
@@ -573,9 +629,12 @@
         "Henüz fotoğraf veya video seçilmedi.";
 
       return;
+
     }
 
+
     let text = "";
+
 
     if (photos.length > 0) {
 
@@ -586,6 +645,7 @@
 
     }
 
+
     if (
       photos.length > 0 &&
       videos.length > 0
@@ -594,6 +654,7 @@
       text += "  •  ";
 
     }
+
 
     if (videos.length > 0) {
 
@@ -604,7 +665,9 @@
 
     }
 
-    fileName.textContent = text;
+
+    fileName.textContent =
+      text;
 
   }
 
@@ -622,7 +685,7 @@
 
 
   /* =====================================================
-     PAYLAŞ
+     DOSYALARI YÜKLE
   ===================================================== */
 
   uploadButton.addEventListener(
@@ -630,10 +693,14 @@
     async function() {
 
       const photos =
-        Array.from(photoInput.files || []);
+        Array.from(
+          photoInput.files || []
+        );
 
       const videos =
-        Array.from(videoInput.files || []);
+        Array.from(
+          videoInput.files || []
+        );
 
       const files =
         photos.concat(videos);
@@ -646,18 +713,15 @@
         noteInput.value.trim();
 
 
-      /* DOSYA KONTROLÜ */
-
       if (files.length === 0) {
 
         status.textContent =
           "Lütfen önce fotoğraf veya video seçin.";
 
         return;
+
       }
 
-
-      /* İSİM KONTROLÜ */
 
       if (!name) {
 
@@ -667,12 +731,13 @@
         nameInput.focus();
 
         return;
+
       }
 
 
-      /* DOSYA BOYUT KONTROLÜ */
-
-      for (const file of files) {
+      for (
+        const file of files
+      ) {
 
         if (
           file.size >
@@ -684,12 +749,14 @@
             file.name;
 
           return;
+
         }
 
       }
 
 
-      uploadButton.disabled = true;
+      uploadButton.disabled =
+        true;
 
       uploadButton.textContent =
         "Dosyalar yükleniyor...";
@@ -703,11 +770,9 @@
         let uploadedCount = 0;
 
 
-        /* =================================================
-           TÜM DOSYALARI TEK TEK YÜKLE
-        ================================================= */
-
-        for (const file of files) {
+        for (
+          const file of files
+        ) {
 
           const extension =
             file.name
@@ -730,8 +795,6 @@
             uniqueFileName;
 
 
-          /* STORAGE */
-
           const {
             error: uploadError
           } =
@@ -742,7 +805,8 @@
                 filePath,
                 file,
                 {
-                  contentType: file.type,
+                  contentType:
+                    file.type,
                   upsert: false
                 }
               );
@@ -754,8 +818,6 @@
 
           }
 
-
-          /* PUBLIC URL */
 
           const {
             data: publicUrlData
@@ -771,8 +833,6 @@
           const fileUrl =
             publicUrlData.publicUrl;
 
-
-          /* VERİTABANI */
 
           const {
             error: databaseError
@@ -808,6 +868,7 @@
 
           uploadedCount++;
 
+
           status.textContent =
             uploadedCount +
             " / " +
@@ -817,15 +878,11 @@
         }
 
 
-        /* BAŞARILI */
-
         status.textContent =
           "✨ " +
           uploadedCount +
           " dosyanız başarıyla paylaşıldı.";
 
-
-        /* FORMU TEMİZLE */
 
         photoInput.value = "";
 
@@ -835,6 +892,7 @@
 
         noteInput.value = "";
 
+
         fileName.textContent =
           "Henüz fotoğraf veya video seçilmedi.";
 
@@ -843,12 +901,11 @@
           "✨ Fotoğraf ve Videoları Paylaş";
 
 
-        /* GALERİYİ GÜNCELLE */
-
         await loadGallery();
 
 
-      } catch (error) {
+      }
+      catch (error) {
 
         console.error(
           "Yükleme hatası:",
@@ -858,21 +915,21 @@
         status.textContent =
           "Bir sorun oluştu. Lütfen tekrar deneyin.";
 
-
         uploadButton.textContent =
           "✨ Fotoğraf ve Videoları Paylaş";
 
       }
 
 
-      uploadButton.disabled = false;
+      uploadButton.disabled =
+        false;
 
     }
   );
 
 
   /* =====================================================
-     GALERİ BUTONU
+     GALERİ
   ===================================================== */
 
   galleryButton.addEventListener(
@@ -881,14 +938,11 @@
   );
 
 
-  /* =====================================================
-     GALERİYİ YÜKLE
-  ===================================================== */
-
   async function loadGallery() {
 
     gallery.style.display =
       "block";
+
 
     galleryContent.innerHTML =
       '<div class="empty">Anılar yükleniyor...</div>';
@@ -945,10 +999,6 @@
       "";
 
 
-    /* =================================================
-       HER DOSYAYI GÖSTER
-    ================================================= */
-
     data.forEach(
       function(item) {
 
@@ -972,8 +1022,6 @@
         let media;
 
 
-        /* VİDEO */
-
         if (isVideo) {
 
           media =
@@ -984,17 +1032,16 @@
           media.src =
             item.file_url;
 
-          media.controls = true;
+          media.controls =
+            true;
 
-          media.playsInline = true;
+          media.playsInline =
+            true;
 
-          media.preload = "metadata";
+          media.preload =
+            "metadata";
 
         }
-
-
-        /* FOTOĞRAF */
-
         else {
 
           media =
