@@ -423,7 +423,7 @@ const videoInput =
   uploadButton.addEventListener("click", async function() {
 
     const file =
-      photoInput.files[0];
+      const file = document.getElementById("video").files[0];
 
     const name =
       nameInput.value.trim();
@@ -454,10 +454,16 @@ const videoInput =
     }
 
 
-    if (!file.type.startsWith("image/")) {
+   if (
+    !file.type.startsWith("image/") &&
+    !file.type.startsWith("video/")
+) {
+    status.textContent = "Lütfen fotoğraf veya video yükleyin.";
+    return;
+}
 
       status.textContent =
-        "Lütfen yalnızca fotoğraf yükleyin.";
+        "Lütfen yalnızca fotoğraf veya video yükleyin.";
 
       return;
 
@@ -477,7 +483,7 @@ const videoInput =
     uploadButton.disabled = true;
 
     uploadButton.textContent =
-      "Fotoğraf yükleniyor...";
+      "Dosya yükleniyor...";
 
     status.textContent = "";
 
